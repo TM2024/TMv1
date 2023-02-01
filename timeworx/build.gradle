@@ -1,0 +1,71 @@
+//针对所有project的配置，包含根项目，除此之外还有subprojects 和 project，感兴趣的童鞋可以自行百度查阅
+allprojects {
+    //创建项目时的你填写
+    group 'com.timeworx'
+    version '1.0-SNAPSHOT'
+
+    //项目是java项目
+    apply plugin: 'java'
+    //项目是idea项目
+    apply plugin: 'idea'
+
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    //jdk版本
+    sourceCompatibility = 1.8
+
+    //仓库：gradle会根据从上到下的顺序依次去仓库中寻找依赖
+    repositories {
+        //优先从本地仓库获取
+        mavenLocal()
+        //从阿里云或者公司仓库获取
+        maven {
+            url 'https://maven.aliyun.com/repository/public/' //配置阿里云 或者 自己公司的仓库
+        }
+        //从中央仓库获取
+        mavenCentral()
+    }
+
+    ext {
+        //这里管理版本
+        junitVersion = '4.13.2'
+    }
+
+    //项目中所使用到的依赖，这里添加的依赖会被所有项目，包括root项目继承
+    dependencies {
+        implementation("junit:junit:$junitVersion")
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+        // 可用于强行排除jar包
+//        exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
+    }
+}
+
+
+//声明gradle脚本自身需要使用的资源
+buildscript {
+    //repositories为什么要要声明两次
+    //
+    //buildscript中的声明是gradle脚本自身需要使用的资源。可以声明的资源包括依赖项、第三方插件、maven仓库地址等。
+    //
+    //而在build.gradle文件中直接声明的依赖项、仓库地址等信息是项目自身需要的资源。
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://maven.aliyun.com/repository/public/"
+        }
+    }
+
+    ext {
+        //这里管理版本
+        springbootVersion = '2.6.12'
+    }
+
+    dependencies {
+        //spring-boot插件
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springbootVersion")
+    }
+}

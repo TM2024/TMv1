@@ -1,0 +1,23 @@
+#gradle
+.gradle/
+
+# idea
+.idea
+*.iml
+
+*.log
+
+build/
+
+logs/*
+
+.project
+.classpath
+.settings
+
+timeworx-admin/out
+timeworx-common/out
+
+gradle
+gradlew
+gradlew.bat

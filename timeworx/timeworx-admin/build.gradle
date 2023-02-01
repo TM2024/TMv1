@@ -1,0 +1,12 @@
+apply plugin:'application'
+
+//启动项
+mainClassName = "com.timeworx.StartServer"
+
+//service项目所需依赖
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    //依赖子项目
+    implementation project (":timeworx-common")
+}

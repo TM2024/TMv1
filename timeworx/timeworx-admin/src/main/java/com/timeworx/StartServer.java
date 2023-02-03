@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author ryzhang
- * @Package com.timeworx
- * @date 2023/2/91 00:17
- * @Copyright
+ * @Description 启动类
+ * @Author: ryzhang
+ * @Date 2023/2/1 00:17 AM
  */
 @SpringBootApplication
 public class StartServer {

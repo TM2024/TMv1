@@ -9,9 +9,6 @@ allprojects {
     //项目是idea项目
     apply plugin: 'idea'
 
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
-
     //jdk版本
     sourceCompatibility = 1.8
 
@@ -30,11 +27,22 @@ allprojects {
     ext {
         //这里管理版本
         junitVersion = '4.13.2'
+        springbootVersion = '2.6.12'
+        shiroVersion = '1.10.1'
     }
 
     //项目中所使用到的依赖，这里添加的依赖会被所有项目，包括root项目继承
     dependencies {
         implementation("junit:junit:$junitVersion")
+        implementation("org.springframework.boot:spring-boot-starter:$springbootVersion")
+        implementation("org.springframework.boot:spring-boot-starter-web:$springbootVersion")
+        implementation("org.springframework.boot:spring-boot-starter-aop:$springbootVersion")
+        implementation("org.projectlombok:lombok:1.18.24")
+
+        implementation ("org.apache.commons:commons-lang3:3.9")
+        implementation ("com.google.code.gson:gson:2.8.9")
+
+        implementation("org.apache.httpcomponents:httpclient:4.5.13")
     }
 
     configurations.all {
@@ -61,11 +69,11 @@ buildscript {
 
     ext {
         //这里管理版本
-        springbootVersion = '2.6.12'
+//        springbootVersion = '2.6.12'
     }
 
     dependencies {
         //spring-boot插件
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springbootVersion")
+//        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springbootVersion")
     }
 }

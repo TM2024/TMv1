@@ -1,5 +1,4 @@
 //公共 所需要的依赖
 dependencies {
-    implementation ("org.apache.commons:commons-lang3:3.9")
 
 }

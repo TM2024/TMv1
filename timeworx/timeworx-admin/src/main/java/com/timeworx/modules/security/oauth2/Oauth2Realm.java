@@ -1,7 +1,8 @@
 package com.timeworx.modules.security.oauth2;
 
 import com.timeworx.modules.security.entity.User;
-import com.timeworx.modules.security.entity.UserMock;
+import com.timeworx.modules.security.service.ShiroService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -10,7 +11,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import javax.annotation.Resource;
 import java.util.Set;
 
 /**
@@ -21,6 +22,19 @@ import java.util.Set;
 @Component
 public class Oauth2Realm extends AuthorizingRealm {
 
+    @Resource
+    private ShiroService shiroService;
+
+    /**
+     * realm必须支持接受token
+     * @param token the token being submitted for authentication.
+     * @return
+     */
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof Oauth2Token;
+    }
+
     /**
      * 授权(验证权限时调用)
      * @param principals the primary identifying principals of the AuthorizationInfo that should be retrieved.
@@ -30,19 +44,13 @@ public class Oauth2Realm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
         String userName = user.getUsername();
+
+        //用户权限列表
+        Set<String> permissionSet = shiroService.getUserPermissions(userName);
+
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-
-        // 获取用户角色
-        Set<String> roleSet = new HashSet<>();
-        String role = UserMock.getRole(userName);
-        roleSet.add(role);
-        simpleAuthorizationInfo.setRoles(roleSet);
-
-        // 获取用户权限
-        String permission = UserMock.getPermission(userName);
-        Set<String> permissionSet = new HashSet<String>();
-        permissionSet.add(permission);
         simpleAuthorizationInfo.setStringPermissions(permissionSet);
+
         return simpleAuthorizationInfo;
     }
 
@@ -54,24 +62,20 @@ public class Oauth2Realm extends AuthorizingRealm {
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        String userName = (String) token.getPrincipal();
-        String password = new String((char[]) token.getCredentials());
 
-        System.out.println("用户" + userName + "认证-----ShiroRealm.doGetAuthenticationInfo");
+        String accessToken = (String) token.getPrincipal();
 
-        // 通过用户名到数据库查询用户信息
-        User user = UserMock.getUserByUsername(userName);
+        // 根据accessToken，查询用户信息
+        String userName = shiroService.getUserByToken(accessToken);
+        // token失效
+        if(StringUtils.isBlank(userName)){
+            throw new IncorrectCredentialsException();
+        }
 
-        if (user == null) {
-            throw new UnknownAccountException("用户名或密码错误！");
-        }
-        if (!password.equals(user.getPassword())) {
-            throw new IncorrectCredentialsException("用户名或密码错误！");
-        }
-        if (user.getState().equals("0")) {
-            throw new LockedAccountException("账号已被锁定,请联系管理员！");
-        }
-        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, password, getName());
+        // 查询用户信息
+        User user = shiroService.findUserName(userName);
+
+        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, accessToken, getName());
         return info;
     }
 }

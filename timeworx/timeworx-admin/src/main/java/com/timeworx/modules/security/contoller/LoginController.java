@@ -1,11 +1,16 @@
 package com.timeworx.modules.security.contoller;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.subject.Subject;
+import com.timeworx.common.entity.Response;
+import com.timeworx.modules.security.entity.User;
+import com.timeworx.modules.security.service.ShiroService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @Description
@@ -15,24 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoginController {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    @Resource
+    private ShiroService shiroService;
+
     @GetMapping("/login")
     @ResponseBody
-    public String login(String username, String password) {
-        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-        // 获取Subject对象
-        Subject subject = SecurityUtils.getSubject();
-        try {
-            // 执行登录
-            subject.login(token);
-            return "ok";
-        } catch (UnknownAccountException e) {
-            return e.getMessage();
-        } catch (IncorrectCredentialsException e) {
-            return "IncorrectCredentialsException " + e.getMessage();
-        } catch (LockedAccountException e) {
-            return "LockedAccountException " + e.getMessage();
-        } catch (AuthenticationException e) {
-            return "认证失败！";
+    public Response<String> login(String username, String password) {
+        // 校验用户名
+        if(StringUtils.isBlank(username)){
+            logger.warn("method:login, username empty!");
+            return new Response<>("1", "用户名为空");
         }
+
+        User user = shiroService.findUserName(username);
+
+        // 比较密码
+        if(user == null || !user.getPassword().equals(password)){
+            return new Response<>("1","用户名和密码不正确");
+        }
+
+        // 登陆成功 生成token
+        String token = shiroService.createToken(user.getId());
+
+        return new Response<>("0", "success", token);
     }
 }

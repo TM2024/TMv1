@@ -1,4 +1,5 @@
 rootProject.name = 'timeworx'
 include 'timeworx-admin'
 include 'timeworx-common'
+include 'timeworx-storage'
 

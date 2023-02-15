@@ -1,6 +1,6 @@
 package com.timeworx.modules.security.oauth2;
 
-import com.timeworx.common.entity.Response;
+import com.timeworx.common.entity.base.Response;
 
 import java.security.MessageDigest;
 import java.util.UUID;

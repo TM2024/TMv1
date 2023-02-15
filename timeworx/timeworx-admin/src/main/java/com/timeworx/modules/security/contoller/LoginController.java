@@ -1,7 +1,7 @@
 package com.timeworx.modules.security.contoller;
 
-import com.timeworx.common.entity.Response;
-import com.timeworx.modules.security.entity.User;
+import com.timeworx.common.entity.base.Response;
+import com.timeworx.common.entity.user.User;
 import com.timeworx.modules.security.service.ShiroService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

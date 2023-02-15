@@ -1,6 +1,7 @@
 package com.timeworx.modules.security.oauth2;
 
-import com.timeworx.modules.security.entity.User;
+
+import com.timeworx.common.entity.user.User;
 import com.timeworx.modules.security.service.ShiroService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -43,7 +44,7 @@ public class Oauth2Realm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
-        String userName = user.getUsername();
+        String userName = user.getName();
 
         //用户权限列表
         Set<String> permissionSet = shiroService.getUserPermissions(userName);

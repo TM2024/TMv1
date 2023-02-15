@@ -1,4 +1,4 @@
-package com.timeworx.common.entity;
+package com.timeworx.common.entity.base;
 
 import lombok.Data;
 

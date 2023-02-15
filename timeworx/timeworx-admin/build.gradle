@@ -1,14 +1,16 @@
 apply plugin:'application'
 
-//启动项
+// 启动项
 mainClassName = "com.timeworx.StartServer"
 
-//service项目所需依赖
+// service项目所需依赖
 dependencies {
 
     implementation("org.apache.shiro:shiro-core:$shiroVersion")
     implementation("org.apache.shiro:shiro-spring:$shiroVersion")
 
-    //依赖子项目
+    // 依赖公共项目
     implementation project (":timeworx-common")
+    // 依赖启动项
+    implementation project (":timeworx-storage")
 }

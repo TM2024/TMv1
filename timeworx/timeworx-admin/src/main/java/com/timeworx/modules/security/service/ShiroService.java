@@ -1,8 +1,11 @@
 package com.timeworx.modules.security.service;
 
-import com.timeworx.modules.security.entity.User;
+
+import com.timeworx.common.entity.user.User;
+import com.timeworx.storage.mapper.user.UserMapper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,21 +17,25 @@ import java.util.Set;
 @Service
 public class ShiroService {
 
+    @Resource
+    private UserMapper userMapper;
+
     public User findUserName(String username) {
         //TODO 数据库查询
+//        User user = userMapper.findUserByName(username);
         User user = new User();
         if(username.equals("admin")) {
             user.setId(1l);
-            user.setUsername("admin");
+            user.setName("admin");
             user.setPassword("123");
-            user.setRole("admin");
+            user.setType(1);
         }else {
             user.setId(2l);
-            user.setUsername("admin1");
+            user.setName("admin1");
             user.setPassword("456");
-            user.setRole("user");
+            user.setType(0);
         }
-        user.setState("1");
+        user.setStatus(1);
         return user;
     }
 

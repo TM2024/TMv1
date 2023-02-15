@@ -28,7 +28,9 @@ allprojects {
         //这里管理版本
         junitVersion = '4.13.2'
         springbootVersion = '2.6.12'
+        springVersion = '5.3.23'
         shiroVersion = '1.10.1'
+        redisVersion = '2.9.3'
     }
 
     //项目中所使用到的依赖，这里添加的依赖会被所有项目，包括root项目继承

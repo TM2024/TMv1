@@ -7,6 +7,9 @@ dependencies {
     implementation("com.mchange:c3p0:0.9.5.2")
     implementation("org.springframework:spring-jdbc:$springVersion")
 
+    // redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:$springbootVersion")
+
     // 依赖公共项目
     implementation project (":timeworx-common")
 }

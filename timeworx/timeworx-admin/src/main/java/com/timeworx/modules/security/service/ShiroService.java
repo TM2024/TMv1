@@ -22,20 +22,7 @@ public class ShiroService {
 
     public User findUserName(String username) {
         //TODO 数据库查询
-//        User user = userMapper.findUserByName(username);
-        User user = new User();
-        if(username.equals("admin")) {
-            user.setId(1l);
-            user.setName("admin");
-            user.setPassword("123");
-            user.setType(1);
-        }else {
-            user.setId(2l);
-            user.setName("admin1");
-            user.setPassword("456");
-            user.setType(0);
-        }
-        user.setStatus(1);
+        User user = userMapper.findUserByName(username);
         return user;
     }
 

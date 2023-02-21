@@ -9,7 +9,7 @@ jdbc:
     driverClass: com.mysql.cj.jdbc.Driver
     jdbcUrl: jdbc:mysql://localhost:3306/timeworx?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true&useSSL=false
     user: root
-    password: 123456
+    password: a1118zry
   # 初始化连接池中的连接数，取值应在minPoolSize与maxPoolSize之间，默认为3
   initialPoolSize: 5
   # 最大空闲时间，60秒内未使用则连接被丢弃。若为0则永不丢弃。默认值: 0
@@ -28,3 +28,32 @@ jdbc:
   acquireRetryDelay: 1000
   # 每120秒检查所有连接池中的空闲连接。默认值: 0，不检查
   idleConnectionTestPeriod: 120
+
+
+spring:
+  # redis 默认配置
+  redis:
+    database: 0   # Redis数据库索引
+#    password: test123456   # redis哨兵密码
+    password: 1307@Jjfa   # redis集群密码
+    lettuce:
+      pool:
+        max-idle: 16
+        max-active: 32
+        min-idle: 8
+    # Redis单机单实例
+    host: 127.0.0.1
+    port: 6379
+    # Redis哨兵模式
+#    sentinel:
+#      master: aiyx01 #哨兵的名字 #下面是所有哨兵集群节点
+#      nodes: 172.31.4.20:8505,172.31.4.20:8506
+#    cluster:
+#      nodes:
+#        #地址要和redis配置中bind地址一致
+#        - 172.31.234.128:7000
+#        - 172.31.234.128:7001
+#        - 172.31.234.131:7000
+#        - 172.31.234.131:7001
+#        - 172.31.234.146:7000
+#        - 172.31.234.146:7001

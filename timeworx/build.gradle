@@ -31,6 +31,7 @@ allprojects {
         springVersion = '5.3.23'
         shiroVersion = '1.10.1'
         redisVersion = '2.9.3'
+        lombokVersion = '1.18.24'
     }
 
     //项目中所使用到的依赖，这里添加的依赖会被所有项目，包括root项目继承
@@ -39,7 +40,13 @@ allprojects {
         implementation("org.springframework.boot:spring-boot-starter:$springbootVersion")
         implementation("org.springframework.boot:spring-boot-starter-web:$springbootVersion")
         implementation("org.springframework.boot:spring-boot-starter-aop:$springbootVersion")
-        implementation("org.projectlombok:lombok:1.18.24")
+        implementation("org.projectlombok:lombok:$lombokVersion")
+
+        // 处理 lombok 编译异常问题
+        compileOnly("org.projectlombok:lombok:$lombokVersion")
+        testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+        annotationProcessor("org.projectlombok:lombok:$lombokVersion")
+        testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
         implementation ("org.apache.commons:commons-lang3:3.9")
         implementation ("com.google.code.gson:gson:2.8.9")

@@ -1,5 +1,6 @@
 package com.timeworx.common.entity.base;
 
+import com.timeworx.common.constant.ReturnCode;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,5 +31,13 @@ public class Response<T> implements Serializable {
         this.code = code;
         this.desc = desc;
         this.data = data;
+    }
+
+    /**
+     * 响应是否是成功的
+     * @return
+     */
+    public boolean isSuccess(){
+        return ReturnCode.SUCCESS.equals(code);
     }
 }

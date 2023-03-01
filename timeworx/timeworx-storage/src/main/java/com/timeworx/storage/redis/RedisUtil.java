@@ -29,21 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Redis工具类
- *
- * 声明: 此工具只简单包装了redisTemplate的大部分常用的api, 没有包装redisTemplate所有的api。
- *      如果对此工具类中的功能不太满意, 或对StringRedisTemplate提供的api不太满意，
- *      那么可自行实现相应的{@link StringRedisTemplate}类中的对应execute方法, 以达
- *      到自己想要的效果; 至于如何实现,则可参考源码或{@link RedisUtil.LockOps}中的方法。
- *
- * 注: 此工具类依赖spring-boot-starter-data-redis类库、以及可选的lombok、fastjson
- * 注: 更多javadoc细节，可详见{@link RedisOperations}
- *
- * 统一说明一: 方法中的key、 value都不能为null。
- * 统一说明二: 不能跨数据类型进行操作， 否者会操作失败/操作报错。
- *            如: 向一个String类型的做Hash操作，会失败/报错......等等
- *
- * @author JustryDeng
- * @date 2020/3/7 16:50:05
+ * @author ryzhang7
+ * @date 2023/3/1 16:50:05
  */
 
 @Component
@@ -52,7 +39,6 @@ public class RedisUtil implements ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(RedisUtil.class);
 
-    /** 使用StringRedisTemplate(，其是RedisTemplate的定制化升级) */
     private static StringRedisTemplate redisTemplate;
 
     @Override
@@ -62,9 +48,6 @@ public class RedisUtil implements ApplicationContextAware {
 
     /**
      * key相关操作
-     *
-     * @author JustryDeng
-     * @date 2020/3/7 16:54:25
      */
     public static class KeyOps {
 

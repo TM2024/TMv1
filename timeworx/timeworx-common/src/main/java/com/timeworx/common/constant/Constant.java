@@ -13,20 +13,11 @@ package com.timeworx.common.constant;
  * @Author: ryzhang
  * @Date 2023/2/3 11:30 PM
  */
-public interface Constant {
-    /**
-     * 成功
-     */
-    int SUCCESS = 1;
-    /**
-     * 失败
-     */
-    int FAIL = 0;
-
+public class Constant {
     /**
      * token header
      */
-    String TOKEN_HEADER = "token";
+    public static final String TOKEN_HEADER = "token";
 
 
 }

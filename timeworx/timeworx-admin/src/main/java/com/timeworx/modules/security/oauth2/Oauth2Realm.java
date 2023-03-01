@@ -67,14 +67,14 @@ public class Oauth2Realm extends AuthorizingRealm {
         String accessToken = (String) token.getPrincipal();
 
         // 根据accessToken，查询用户信息
-        String userName = shiroService.getUserByToken(accessToken);
+        String userId = shiroService.getUserByToken(accessToken);
         // token失效
-        if(StringUtils.isBlank(userName)){
+        if(StringUtils.isBlank(userId)){
             throw new IncorrectCredentialsException();
         }
 
         // 查询用户信息
-        User user = shiroService.findUserName(userName);
+        User user = shiroService.findUserById(Long.parseLong(userId));
 
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, accessToken, getName());
         return info;

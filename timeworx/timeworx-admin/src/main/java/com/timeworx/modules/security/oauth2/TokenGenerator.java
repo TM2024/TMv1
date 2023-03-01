@@ -1,5 +1,6 @@
 package com.timeworx.modules.security.oauth2;
 
+import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
 
 import java.security.MessageDigest;
@@ -35,9 +36,9 @@ public class TokenGenerator {
             algorithm.reset();
             algorithm.update(param.getBytes());
             byte[] messageDigest = algorithm.digest();
-            return new Response<>("0", "success", toHexString(messageDigest));
+            return new Response<>(ReturnCode.SUCCESS, "success", toHexString(messageDigest));
         } catch (Exception e) {
-            return new Response<>("1", "token invalid");
+            return new Response<>(ReturnCode.EXCEPTION, "token invalid");
         }
     }
 }

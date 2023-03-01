@@ -1,5 +1,6 @@
 package com.timeworx.modules.security.contoller;
 
+import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
 import com.timeworx.modules.security.service.ShiroService;
@@ -31,19 +32,19 @@ public class LoginController {
         // 校验用户名
         if(StringUtils.isBlank(username)){
             logger.warn("method:login, username empty!");
-            return new Response<>("1", "用户名为空");
+            return new Response<>(ReturnCode.PARAM_EMPTY, "username empty!");
         }
 
-        User user = shiroService.findUserName(username);
+        User user = shiroService.findUserByName(username);
 
         // 比较密码
         if(user == null || !user.getPassword().equals(password)){
-            return new Response<>("1","用户名和密码不正确");
+            return new Response<>(ReturnCode.PARAM_FORMAT_ERROR,"username or password incorrect!");
         }
 
         // 登陆成功 生成token
-        String token = shiroService.createToken(user.getId());
+        Response<String> response = shiroService.createToken(user.getId());
 
-        return new Response<>("0", "success", token);
+        return response;
     }
 }

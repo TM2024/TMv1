@@ -29,12 +29,15 @@ public class ReturnCode implements Serializable {
 
     /**
      * 20：参数格式
-     * 2000: 参数格式错误
-     * 2001：参数格式缺失
+     * 2000: 参数错误
      */
-    public static final String PARAM_FORMAT_ERROR = "2000";
+    public static final String PARAM_ERROR = "2000";
 
-    public static final String PARAM_EMPTY = "2001";
+    /**
+     * 50：数据冲突
+     * 5000: 数据已存在
+     */
+    public static final String DATA_EXIST = "5000";
 
 
     /**

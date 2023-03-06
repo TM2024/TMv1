@@ -40,6 +40,10 @@ allprojects {
         implementation("org.springframework.boot:spring-boot-starter:$springbootVersion")
         implementation("org.springframework.boot:spring-boot-starter-web:$springbootVersion")
         implementation("org.springframework.boot:spring-boot-starter-aop:$springbootVersion")
+        implementation("org.springframework.boot:spring-boot-starter-validation:$springbootVersion")
+        // email
+        implementation("org.springframework.boot:spring-boot-starter-mail:$springbootVersion")
+
         implementation("org.projectlombok:lombok:$lombokVersion")
 
         // 处理 lombok 编译异常问题

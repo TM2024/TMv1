@@ -53,9 +53,7 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 根据key, 删除redis中的对应key-value
-         *
          *  注: 若删除失败, 则返回false。
-         *
          *      若redis中，不存在该key, 那么返回的也是false。
          *      所以，不能因为返回了false,就认为redis中一定还存
          *      在该key对应的key-value。
@@ -63,13 +61,11 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            要删除的key
          * @return  删除是否成功
-         * @date 2020/3/7 17:15:02
          */
         public static boolean delete(String key) {
-            log.debug("delete(...) => key -> {}", key);
             // 返回值只可能为true/false, 不可能为null
             Boolean result = redisTemplate.delete(key);
-            log.debug("delete(...) => result -> {}", result);
+            log.debug("delete {} => result -> {}", key, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -78,20 +74,16 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 根据keys, 批量删除key-value
-         *
          * 注: 若redis中，不存在对应的key, 那么计数不会加1, 即:
          *     redis中存在的key-value里，有名为a1、a2的key，
          *     删除时，传的集合是a1、a2、a3，那么返回结果为2。
-         *
          * @param keys
          *            要删除的key集合
          * @return  删除了的key-value个数
-         * @date 2020/3/7 17:48:04
          */
         public static long delete(Collection<String> keys) {
-            log.debug("delete(...) => keys -> {}", keys);
             Long count = redisTemplate.delete(keys);
-            log.debug("delete(...) => count -> {}", count);
+            log.debug("delete {} => count -> {}", keys, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -100,26 +92,21 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 将key对应的value值进行序列化，并返回序列化后的value值。
-         *
          * 注: 若不存在对应的key, 则返回null。
          * 注: dump时，并不会删除redis中的对应key-value。
          * 注: dump功能与restore相反。
-         *
          * @param key
          *            要序列化的value的key
          * @return  序列化后的value值
-         * @date 2020/3/8 11:34:13
          */
         public static byte[] dump(String key) {
-            log.debug("dump(...) =>key -> {}", key);
             byte[] result = redisTemplate.dump(key);
-            log.debug("dump(...) => result -> {}", result);
+            log.debug("dump {} => result -> {}", key, result);
             return result;
         }
 
         /**
          * 将给定的value值，反序列化到redis中, 形成新的key-value。
-         *
          * @param key
          *            value对应的key
          * @param value
@@ -132,7 +119,6 @@ public class RedisUtil implements ApplicationContextAware {
          *
          * @throws RedisSystemException
          *             如果redis中已存在同样的key时，抛出此异常
-         * @date 2020/3/8 11:36:45
          */
         public static void restore(String key, byte[] value, long timeToLive, TimeUnit unit) {
             restore(key, value, timeToLive, unit, false);
@@ -140,7 +126,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 将给定的value值，反序列化到redis中, 形成新的key-value。
-         *
          * @param key
          *            value对应的key
          * @param value
@@ -155,26 +140,22 @@ public class RedisUtil implements ApplicationContextAware {
          *
          * @throws RedisSystemException
          *             如果redis中已存在同样的key, 且replace为false时，抛出此异常
-         * @date 2020/3/8 11:36:45
          */
         public static void restore(String key, byte[] value, long timeout, TimeUnit unit, boolean replace) {
-            log.debug("restore(...) => key -> {}, value -> {}, timeout -> {}, unit -> {}, replace -> {}",
+            log.debug("restore => key -> {}, value -> {}, timeout -> {}, unit -> {}, replace -> {}",
                     key, value, timeout, unit, replace);
             redisTemplate.restore(key, value, timeout, unit, replace);
         }
 
         /**
          * redis中是否存在,指定key的key-value
-         *
          * @param key
          *            指定的key
          * @return  是否存在对应的key-value
-         * @date 2020/3/8 12:16:46
          */
         public static boolean hasKey(String key) {
-            log.debug("hasKey(...) => key -> {}", key);
             Boolean result = redisTemplate.hasKey(key);
-            log.debug("hasKey(...) => result -> {}", result);
+            log.debug("hasKey {} => result -> {}", key, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -183,7 +164,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 给指定的key对应的key-value设置: 多久过时
-         *
          * 注:过时后，redis会自动删除对应的key-value。
          * 注:若key不存在，那么也会返回false。
          *
@@ -194,12 +174,10 @@ public class RedisUtil implements ApplicationContextAware {
          * @param unit
          *            timeout的单位
          * @return  操作是否成功
-         * @date 2020/3/8 12:18:58
          */
         public static boolean expire(String key, long timeout, TimeUnit unit) {
-            log.debug("expire(...) => key -> {}, timeout -> {}, unit -> {}", key, timeout, unit);
             Boolean result = redisTemplate.expire(key, timeout, unit);
-            log.debug("expire(...) => result is -> {}", result);
+            log.debug("expire key -> {}, timeout -> {}, unit -> {} => result is -> {}", key, timeout, unit, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -208,7 +186,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 给指定的key对应的key-value设置: 什么时候过时
-         *
          * 注:过时后，redis会自动删除对应的key-value。
          * 注:若key不存在，那么也会返回false。
          *
@@ -218,12 +195,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            啥时候过时
          *
          * @return  操作是否成功
-         * @date 2020/3/8 12:19:29
          */
         public static boolean expireAt(String key, Date date) {
-            log.debug("expireAt(...) => key -> {}, date -> {}", key, date);
             Boolean result = redisTemplate.expireAt(key, date);
-            log.debug("expireAt(...) => result is -> {}", result);
+            log.debug("expireAt key -> {}, date -> {} => result is -> {}", key, date, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -232,7 +207,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 找到所有匹配pattern的key,并返回该key的结合.
-         *
          * 提示:若redis中键值对较多，此方法耗时相对较长，慎用！慎用！慎用！
          *
          * @param pattern
@@ -242,18 +216,15 @@ public class RedisUtil implements ApplicationContextAware {
          *                 *     >=0哥;
          *
          * @return  匹配pattern的key的集合。 可能为null。
-         * @date 2020/3/8 12:38:38
          */
         public static Set<String> keys(String pattern) {
-            log.debug("keys(...) => pattern -> {}", pattern);
             Set<String> keys = redisTemplate.keys(pattern);
-            log.debug("keys(...) => keys -> {}", keys);
+            log.debug("keys pattern -> {} => keys -> {}", pattern, keys);
             return keys;
         }
 
         /**
          * 将当前数据库中的key对应的key-value,移动到对应位置的数据库中。
-         *
          * 注:单机版的redis,默认将存储分为16个db, index为0 到 15。
          * 注:同一个db下，key唯一； 但是在不同db中，key可以相同。
          * 注:若目标db下，已存在相同的key, 那么move会失败，返回false。
@@ -264,12 +235,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要移动到哪个db
          * @return 移动是否成功。
          *         注: 若目标db下，已存在相同的key, 那么move会失败，返回false。
-         * @date 2020/3/8 13:01:00
          */
         public static boolean move(String key, int dbIndex) {
-            log.debug("move(...) => key  -> {}, dbIndex -> {}", key, dbIndex);
             Boolean result = redisTemplate.move(key, dbIndex);
-            log.debug("move(...) =>result -> {}", result);
+            log.debug("move key  -> {}, dbIndex -> {} => result -> {}", key, dbIndex, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -278,19 +247,16 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 移除key对应的key-value的过期时间, 使该key-value一直存在
-         *
          * 注: 若key对应的key-value，本身就是一直存在(无过期时间的)， 那么persist方法会返回false;
          *    若没有key对应的key-value存在，本那么persist方法会返回false;
          *
          * @param key
          *            定位key-value的key
          * @return 操作是否成功
-         * @date 2020/3/8 13:10:02
          */
         public static boolean persist(String key) {
-            log.debug("persist(...) => key -> {}", key);
             Boolean result = redisTemplate.persist(key);
-            log.debug("persist(...) => result -> {}", result);
+            log.debug("persist key -> {} => result -> {}", key, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -299,7 +265,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取key对应的key-value的过期时间
-         *
          * 注: 若key-value永不过期， 那么返回的为-1。
          * 注: 若不存在key对应的key-value， 那么返回的为-2
          * 注:若存在零碎时间不足1 SECONDS,则(大体上)四舍五入到SECONDS级别。
@@ -307,7 +272,6 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            定位key-value的key
          * @return  过期时间(单位s)
-         * @date 2020/3/8 13:17:35
          */
         public static long getExpire(String key) {
             Long result = getExpire(key, TimeUnit.SECONDS);
@@ -316,7 +280,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取key对应的key-value的过期时间
-         *
          * 注: 若key-value永不过期， 那么返回的为-1。
          * 注: 若不存在key对应的key-value， 那么返回的为-2
          * 注:若存在零碎时间不足1 unit,则(大体上)四舍五入到unit别。
@@ -324,12 +287,10 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            定位key-value的key
          * @return  过期时间(单位unit)
-         * @date 2020/3/8 13:17:35
          */
         public static long getExpire(String key, TimeUnit unit) {
-            log.debug("getExpire(...) =>key -> {}, unit is -> {}", key, unit);
             Long result = redisTemplate.getExpire(key, unit);
-            log.debug("getExpire(...) => result ->  {}", result);
+            log.debug("getExpire key -> {}, unit is -> {} => result ->  {}", key, unit, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -338,21 +299,18 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从redis的所有key中，随机获取一个key
-         *
          * 注: 若redis中不存在任何key-value, 那么这里返回null
          *
          * @return  随机获取到的一个key
-         * @date 2020/3/8 14:11:43
          */
         public static String randomKey() {
             String result = redisTemplate.randomKey();
-            log.debug("randomKey(...) => result is -> {}", result);
+            log.debug("randomKey => result is -> {}", result);
             return result;
         }
 
         /**
          * 重命名对应的oldKey为新的newKey
-         *
          * 注: 若oldKey不存在， 则会抛出异常.
          * 注: 若redis中已存在与newKey一样的key,
          *     那么原key-value会被丢弃，
@@ -366,17 +324,15 @@ public class RedisUtil implements ApplicationContextAware {
          *            新的key
          * @throws RedisSystemException
          *             若oldKey不存在时， 抛出此异常
-         * @date 2020/3/8 14:14:17
          */
         public static void rename(String oldKey, String newKey) {
-            log.debug("rename(...) => oldKey -> {}, newKey -> {}", oldKey, newKey);
+            log.debug("rename => oldKey -> {}, newKey -> {}", oldKey, newKey);
             redisTemplate.rename(oldKey, newKey);
         }
 
         /**
          * 当redis中不存在newKey时, 重命名对应的oldKey为新的newKey。
          * 否者不进行重命名操作。
-         *
          * 注: 若oldKey不存在， 则会抛出异常.
          *
          * @param oldKey
@@ -385,12 +341,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            新的key
          * @throws RedisSystemException
          *             若oldKey不存在时， 抛出此异常
-         * @date 2020/3/8 14:14:17
          */
         public static boolean renameIfAbsent(String oldKey, String newKey) {
-            log.debug("renameIfAbsent(...) => oldKey -> {}, newKey -> {}", oldKey, newKey);
             Boolean result = redisTemplate.renameIfAbsent(oldKey, newKey);
-            log.debug("renameIfAbsent(...) => result -> {}", result);
+            log.debug("renameIfAbsent oldKey -> {}, newKey -> {} => result -> {}", oldKey, newKey, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -399,60 +353,48 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取key对应的value的数据类型
-         *
          * 注: 若redis中不存在该key对应的key-value， 那么这里返回NONE。
          *
          * @param key
          *            用于定位的key
          * @return  key对应的value的数据类型
-         * @date 2020/3/8 14:40:16
          */
         public static DataType type(String key) {
-            log.debug("type(...) => key -> {}", key);
             DataType result = redisTemplate.type(key);
-            log.debug("type(...) => result -> {}", result);
+            log.debug("type key -> {} => result -> {}", key, result);
             return result;
         }
     }
 
     /**
      * string相关操作
-     *
      * 提示: redis中String的数据结构可参考resources/data-structure/String(字符串)的数据结构(示例一).png
      *      redis中String的数据结构可参考resources/data-structure/String(字符串)的数据结构(示例二).png
-     *
-     * @author JustryDeng
-     * @date 2020/3/7 16:54:25
      */
     public static class StringOps {
 
         /**
          * 设置key-value
-         *
          * 注: 若已存在相同的key, 那么原来的key-value会被丢弃。
          *
          * @param key
          *            key
          * @param value
          *            key对应的value
-         * @date 2020/3/8 15:40:59
          */
         public static void set(String key, String value) {
-            log.debug("set(...) => key -> {}, value -> {}", key, value);
+            log.debug("set => key -> {}, value -> {}", key, value);
             redisTemplate.opsForValue().set(key, value);
         }
 
         /**
          * 处理redis中key对应的value值, 将第offset位的值, 设置为1或0。
-         *
          * 说明: 在redis中，存储的字符串都是以二级制的进行存在的; 如存储的key-value里，值为abc,实际上，
          *       在redis里面存储的是011000010110001001100011,前8为对应a,中间8为对应b,后面8位对应c。
          *       示例：这里如果setBit(key, 6, true)的话，就是将索引位置6的那个数，设置值为1，值就变成
          *            了011000110110001001100011
          *       追注:offset即index,从0开始。
-         *
          * 注: 参数value为true, 则设置为1；参数value为false, 则设置为0。
-         *
          * 注: 若redis中不存在对应的key,那么会自动创建新的。
          * 注: offset可以超过value在二进制下的索引长度。
          *
@@ -464,12 +406,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            改为1或0, true - 改为1, false - 改为0
          *
          * @return set是否成功
-         * @date 2020/3/8 16:30:37
          */
         public static boolean setBit(String key, long offset, boolean value) {
-            log.debug("setBit(...) => key -> {}, offset -> {}, value -> {}", key, offset, value);
             Boolean result = redisTemplate.opsForValue().setBit(key, offset, value);
-            log.debug("setBit(...) => result -> {}", result);
+            log.debug("setBit key -> {}, offset -> {}, value -> {} => result -> {}", key, offset, value, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -478,7 +418,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 设置key-value
-         *
          * 注: 若已存在相同的key, 那么原来的key-value会被丢弃
          *
          * @param key
@@ -489,10 +428,9 @@ public class RedisUtil implements ApplicationContextAware {
          *            过时时长
          * @param unit
          *            timeout的单位
-         * @date 2020/3/8 15:40:59
          */
         public static void setEx(String key, String value, long timeout, TimeUnit unit) {
-            log.debug("setEx(...) => key -> {}, value -> {}, timeout -> {}, unit -> {}",
+            log.debug("setEx => key -> {}, value -> {}, timeout -> {}, unit -> {}",
                     key, value, timeout, unit);
             redisTemplate.opsForValue().set(key, value, timeout, unit);
         }
@@ -500,19 +438,15 @@ public class RedisUtil implements ApplicationContextAware {
         /**
          * 若不存在key时, 向redis中添加key-value, 返回成功/失败。
          * 若存在，则不作任何操作, 返回false。
-         *
          * @param key
          *            key
          * @param value
          *            key对应的value
-         *
          * @return set是否成功
-         * @date 2020/3/8 16:51:36
          */
         public static boolean setIfAbsent(String key, String value) {
-            log.debug("setIfAbsent(...) => key -> {}, value -> {}", key, value);
             Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value);
-            log.debug("setIfAbsent(...) => result -> {}", result);
+            log.debug("setIfAbsent key -> {}, value -> {} => result -> {}", key, value, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -522,7 +456,6 @@ public class RedisUtil implements ApplicationContextAware {
         /**
          * 若不存在key时, 向redis中添加一个(具有超时时长的)key-value, 返回成功/失败。
          * 若存在，则不作任何操作, 返回false。
-         *
          * @param key
          *            key
          * @param value
@@ -531,14 +464,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            超时时长
          * @param unit
          *            timeout的单位
-         *
          * @return set是否成功
-         * @date 2020/3/8 16:51:36
          */
         public static boolean setIfAbsent(String key, String value, long timeout, TimeUnit unit) {
-            log.debug("setIfAbsent(...) => key -> {}, value -> {}, key -> {}, value -> {}", key, value, timeout, unit);
             Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, timeout, unit);
-            log.debug("setIfAbsent(...) => result -> {}", result);
+            log.debug("setIfAbsent key -> {}, value -> {}, key -> {}, value -> {} => result -> {}", key, value, timeout, unit, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -547,14 +477,11 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从(redis中key对应的)value的offset位置起(包含该位置),用replaceValue替换对应长度的值。
-         *
          * 举例说明:
          *       1.假设redis中存在key-value ("ds", "0123456789"); 调
          *         用setRange("ds", "abcdefghijk", 3)后， redis中该value值就变为了[012abcdefghijk]
-         *
          *       2.假设redis中存在key-value ("jd", "0123456789");调
          *         用setRange("jd", "xyz", 3)后， redis中该value值就变为了[012xyz6789]
-         *
          *       3.假设redis中存在key-value ("ey", "0123456789");调
          *         用setRange("ey", "qwer", 15)后， redis中该value值就变为了[0123456789     qwer]
          *       注:case3比较特殊，offset超过了原value的长度了, 中间就会有一些空格来填充，但是如果在程序
@@ -566,28 +493,24 @@ public class RedisUtil implements ApplicationContextAware {
          *            要替换的值
          * @param offset
          *            起始位置
-         * @date 2020/3/8 17:04:31
          */
         public static void setRange(String key, String replaceValue, long offset) {
-            log.debug("setRange(...) => key -> {}, replaceValue -> {}, offset -> {}", key, replaceValue, offset);
+            log.debug("setRange => key -> {}, replaceValue -> {}, offset -> {}", key, replaceValue, offset);
             redisTemplate.opsForValue().set(key, replaceValue, offset);
         }
 
         /**
          * 获取到key对应的value的长度。
-         *
          * 注: 长度等于{@link String#length}。
          * 注: 若redis中不存在对应的key-value, 则返回值为0.
          *
          * @param key
          *            定位value的key
          * @return  value的长度
-         * @date 2020/3/8 17:14:30
          */
         public static long size(String key) {
-            log.debug("size(...) => key -> {}", key);
             Long result = redisTemplate.opsForValue().size(key);
-            log.debug("size(...) => result -> {}", result);
+            log.debug("size key -> {} => result -> {}", key, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -596,40 +519,33 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 批量设置 key-value
-         *
          * 注: 若存在相同的key, 则原来的key-value会被丢弃。
          *
          * @param maps
          *            key-value 集
-         * @date 2020/3/8 17:21:19
          */
         public static void multiSet(Map<String, String> maps) {
-            log.debug("multiSet(...) => maps -> {}", maps);
+            log.debug("multiSet => maps -> {}", maps);
             redisTemplate.opsForValue().multiSet(maps);
         }
 
         /**
          * 当redis中,不存在任何一个keys时, 才批量设置 key-value, 并返回成功/失败.
          * 否者，不进行任何操作, 并返回false。
-         *
          * 即: 假设调用此方法时传入的参数map是这样的: {k1=v1, k2=v2, k3=v3}
          *     那么redis中, k1、k2、k3都不存在时,才会批量设置key-value;
          *     否则不会设置任何key-value。
-         *
          * 注: 若存在相同的key, 则原来的key-value会被丢弃。
-         *
          * 注:
          *
          * @param maps
          *            key-value 集
          *
          * @return 操作是否成功
-         * @date 2020/3/8 17:21:19
          */
         public static boolean multiSetIfAbsent(Map<String, String> maps) {
-            log.debug("multiSetIfAbsent(...) => maps -> {}", maps);
             Boolean result = redisTemplate.opsForValue().multiSetIfAbsent(maps);
-            log.debug("multiSetIfAbsent(...) => result -> {}", result);
+            log.debug("multiSetIfAbsent maps -> {} => result -> {}", maps, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -638,7 +554,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 增/减 整数
-         *
          * 注: 负数则为减。
          * 注: 若key对应的value值不支持增/减操作(即: value不是数字)， 那么会
          *     抛出org.springframework.data.redis.RedisSystemException
@@ -649,12 +564,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            增加多少
          * @return  增加后的总值。
          * @throws RedisSystemException key对应的value值不支持增/减操作时
-         * @date 2020/3/8 17:45:51
          */
         public static long incrBy(String key, long increment) {
-            log.debug("incrBy(...) => key -> {}, increment -> {}", key, increment);
             Long result = redisTemplate.opsForValue().increment(key, increment);
-            log.debug("incrBy(...) => result -> {}", result);
+            log.debug("incrBy key -> {}, increment -> {} => result -> {}", key, increment, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -663,7 +576,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 增/减 浮点数
-         *
          * 注: 慎用浮点数，会有精度问题。
          *     如: 先 RedisUtil.StringOps.set("ds", "123");
          *         然后再RedisUtil.StringOps.incrByFloat("ds", 100.6);
@@ -678,12 +590,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            增加多少
          * @return  增加后的总值。
          * @throws RedisSystemException key对应的value值不支持增/减操作时
-         * @date 2020/3/8 17:45:51
          */
         public static double incrByFloat(String key, double increment) {
-            log.debug("incrByFloat(...) => key -> {}, increment -> {}", key, increment);
             Double result = redisTemplate.opsForValue().increment(key, increment);
-            log.debug("incrByFloat(...) => result -> {}", result);
+            log.debug("incrByFloat key -> {}, increment -> {} => result -> {}", key, increment, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -692,7 +602,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 追加值到末尾
-         *
          * 注: 当redis中原本不存在key时,那么（从效果上来看）此方法就等价于{@link this#set(String, String)}
          *
          * @param key
@@ -700,12 +609,10 @@ public class RedisUtil implements ApplicationContextAware {
          * @param value
          *            要追加的value值
          * @return 追加后， 整个value的长度
-         * @date 2020/3/8 17:59:21
          */
         public static int append(String key, String value) {
-            log.debug("append(...) => key -> {}, value -> {}", key, value);
             Integer result = redisTemplate.opsForValue().append(key, value);
-            log.debug("append(...) => result -> {}", result);
+            log.debug("append key -> {}, value -> {} => result -> {}", key, value, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -723,15 +630,13 @@ public class RedisUtil implements ApplicationContextAware {
          * @date 2020/3/8 16:27:41
          */
         public static String get(String key) {
-            log.debug("get(...) => key -> {}", key);
             String result = redisTemplate.opsForValue().get(key);
-            log.debug("get(...) => result -> {} ", result);
+            log.debug("get key -> {} => result -> {} ", key, result);
             return result;
         }
 
         /**
          * 对(key对应的)value进行截取, 截取范围为[start, end]
-         *
          * 注: 若[start, end]的范围不在value的范围中，那么返回的是空字符串 ""
          * 注: 若value只有一部分在[start, end]的范围中，那么返回的是value对应部分的内容(即:不足的地方，并不会以空来填充)
          *
@@ -742,18 +647,15 @@ public class RedisUtil implements ApplicationContextAware {
          * @param end
          *            结尾位置 (从0开始)
          * @return  截取后的字符串
-         * @date 2020/3/8 18:08:45
          */
         public static String getRange(String key, long start, long end) {
-            log.debug("getRange(...) => kry -> {}", key);
             String result = redisTemplate.opsForValue().get(key, start, end);
-            log.debug("getRange(...) => result -> {} ", result);
+            log.debug("getRange key -> {}=> result -> {} ", key, result);
             return result;
         }
 
         /**
          * 给指定key设置新的value, 并返回旧的value
-         *
          * 注: 若redis中不存在key, 那么此操作仍然可以成功， 不过返回的旧值是null
          *
          * @param key
@@ -761,20 +663,16 @@ public class RedisUtil implements ApplicationContextAware {
          * @param newValue
          *            要为该key设置的新的value值
          * @return  旧的value值
-         * @date 2020/3/8 18:14:24
          */
         public static String getAndSet(String key, String newValue) {
-            log.debug("getAndSet(...) => key -> {}, value -> {}", key, newValue);
             String oldValue = redisTemplate.opsForValue().getAndSet(key, newValue);
-            log.debug("getAndSet(...) => oldValue -> {}", oldValue);
+            log.debug("getAndSet key -> {}, value -> {} => oldValue -> {}", key, newValue, oldValue);
             return oldValue;
         }
 
         /**
          * 获取(key对应的)value在二进制下，offset位置的bit值。
-         *
          * 注: 当offset的值在(二进制下的value的)索引范围外时, 返回的也是false。
-         *
          * 示例:
          *      RedisUtil.StringOps.set("akey", "a");
          *      字符串a, 转换为二进制为01100001
@@ -788,9 +686,8 @@ public class RedisUtil implements ApplicationContextAware {
          * @date 2020/3/8 18:21:10
          */
         public static boolean getBit(String key, long offset) {
-            log.debug("getBit(...) => key -> {}, offset -> {}", key, offset);
             Boolean result = redisTemplate.opsForValue().getBit(key, offset);
-            log.debug("getBit(...) => result -> {}", result);
+            log.debug("getBit key -> {}, offset -> {} => result -> {}", key, offset, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -799,40 +696,31 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 批量获取value值
-         *
          * 注: 若redis中，对应的key不存在，那么该key对应的返回的value值为null
          *
          * @param keys
          *            key集
          * @return  value值集合
-         * @date 2020/3/8 18:26:33
          */
         public static List<String> multiGet(Collection<String> keys) {
-            log.debug("multiGet(...) => keys -> {}", keys);
             List<String> result = redisTemplate.opsForValue().multiGet(keys);
-            log.debug("multiGet(...) => result -> {}", result);
+            log.debug("multiGet keys -> {} => result -> {}", keys, result);
             return result;
         }
     }
 
     /**
      * hash相关操作
-     *
      * 提示: 简单的，可以将redis中hash的数据结构看作是 Map<String, Map<HK, HV>>
      * 提示: redis中String的数据结构可参考resources/data-structure/Hash(散列)的数据结构(示例一).png
      *      redis中String的数据结构可参考resources/data-structure/Hash(散列)的数据结构(示例二).png
-     *
-     * @author JustryDeng
-     * @date 2020/3/8 23:39:26
      */
     public static class HashOps {
 
         /**
          * 向key对应的hash中，增加一个键值对entryKey-entryValue
-         *
          * 注: 同一个hash里面，若已存在相同的entryKey， 那么此操作将丢弃原来的entryKey-entryValue，
          *     而使用新的entryKey-entryValue。
-         *
          *
          * @param key
          *            定位hash的key
@@ -840,16 +728,14 @@ public class RedisUtil implements ApplicationContextAware {
          *            要向hash中增加的键值对里的 键
          * @param entryValue
          *            要向hash中增加的键值对里的 值
-         * @date 2020/3/8 23:49:52
          */
         public static void hPut(String key, String entryKey, String entryValue) {
-            log.debug("hPut(...) => key -> {}, entryKey -> {}, entryValue -> {}", key, entryKey, entryValue);
+            log.debug("hPut => key -> {}, entryKey -> {}, entryValue -> {}", key, entryKey, entryValue);
             redisTemplate.opsForHash().put(key, entryKey, entryValue);
         }
 
         /**
          * 向key对应的hash中，增加maps(即: 批量增加entry集)
-         *
          * 注: 同一个hash里面，若已存在相同的entryKey， 那么此操作将丢弃原来的entryKey-entryValue，
          *     而使用新的entryKey-entryValue
          *
@@ -857,10 +743,9 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位hash的key
          * @param maps
          *            要向hash中增加的键值对集
-         * @date 2020/3/8 23:49:52
          */
         public static void hPutAll(String key, Map<String, String> maps) {
-            log.debug("hPutAll(...) => key -> {}, maps -> {}", key, maps);
+            log.debug("hPutAll => key -> {}, maps -> {}", key, maps);
             redisTemplate.opsForHash().putAll(key, maps);
         }
 
@@ -876,13 +761,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            要向hash中增加的键值对里的 值
          *
          * @return 操作是否成功。
-         * @date 2020/3/8 23:49:52
          */
         public static boolean hPutIfAbsent(String key, String entryKey, String entryValue) {
-            log.debug("hPutIfAbsent(...) => key -> {}, entryKey -> {}, entryValue -> {}",
-                    key, entryKey, entryValue);
             Boolean result = redisTemplate.opsForHash().putIfAbsent(key, entryKey, entryValue);
-            log.debug("hPutIfAbsent(...) => result -> {}", result);
+            log.debug("hPutIfAbsent key -> {}, entryKey -> {}, entryValue -> {} => result -> {}"
+                    , key, entryKey, entryValue, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -891,7 +774,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取到key对应的hash里面的对应字段的值
-         *
          * 注: 若redis中不存在对应的key, 则返回null。
          *     若key对应的hash中不存在对应的entryKey, 也会返回null。
          *
@@ -901,36 +783,30 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位hash里面的entryValue的entryKey
          *
          * @return  key对应的hash里的entryKey对应的entryValue值
-         * @date 2020/3/9 9:09:30
          */
         public static Object hGet(String key, String entryKey) {
-            log.debug("hGet(...) => key -> {}, entryKey -> {}", key, entryKey);
             Object entryValue = redisTemplate.opsForHash().get(key, entryKey);
-            log.debug("hGet(...) => entryValue -> {}", entryValue);
+            log.debug("hGet key -> {}, entryKey -> {} => entryValue -> {}", key, entryKey, entryValue);
             return entryValue;
         }
 
         /**
          * 获取到key对应的hash(即: 获取到key对应的Map<HK, HV>)
-         *
          * 注: 若redis中不存在对应的key, 则返回一个没有任何entry的空的Map(，而不是返回null)。
          *
          * @param key
          *            定位hash的key
          *
-         * @return  key对应的hash。
-         * @date 2020/3/9 9:09:30
+         * @return  key对应的hash
          */
         public static Map<Object, Object> hGetAll(String key) {
-            log.debug("hGetAll(...) => key -> {}",  key);
             Map<Object, Object> result = redisTemplate.opsForHash().entries(key);
-            log.debug("hGetAll(...) => result -> {}", result);
+            log.debug("hGetAll key -> {} => result -> {}", key, result);
             return result;
         }
 
         /**
          * 批量获取(key对应的)hash中的entryKey的entryValue
-         *
          * 注: 若hash中对应的entryKey不存在，那么返回的对应的entryValue值为null
          * 注: redis中key不存在，那么返回的List中，每个元素都为null。
          *     追注: 这个List本身不为null, size也不为0， 只是每个list中的每个元素为null而已。
@@ -940,18 +816,15 @@ public class RedisUtil implements ApplicationContextAware {
          * @param entryKeys
          *            需要获取的hash中的字段集
          * @return  hash中对应entryKeys的对应entryValue集
-         * @date 2020/3/9 9:25:38
          */
         public static List<Object> hMultiGet(String key, Collection<Object> entryKeys) {
-            log.debug("hMultiGet(...) => key -> {}, entryKeys -> {}", key, entryKeys);
             List<Object> entryValues = redisTemplate.opsForHash().multiGet(key, entryKeys);
-            log.debug("hMultiGet(...) => entryValues -> {}", entryValues);
+            log.debug("hMultiGet key -> {}, entryKeys -> {} => entryValues -> {}", key, entryKeys, entryValues);
             return entryValues;
         }
 
         /**
          * (批量)删除(key对应的)hash中的对应entryKey-entryValue
-         *
          * 注: 1、若redis中不存在对应的key, 则返回0;
          *     2、若要删除的entryKey，在key对应的hash中不存在，在count不会+1, 如:
          *                 RedisUtil.HashOps.hPut("ds", "name", "邓沙利文");
@@ -967,12 +840,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位要删除的entryKey-entryValue的entryKey
          *
          * @return 删除了对应hash中多少个entry
-         * @date 2020/3/9 9:37:47
          */
         public static long hDelete(String key, Object... entryKeys) {
-            log.debug("hDelete(...) => key -> {}, entryKeys -> {}", key, entryKeys);
             Long count = redisTemplate.opsForHash().delete(key, entryKeys);
-            log.debug("hDelete(...) => count -> {}", count);
+            log.debug("hDelete key -> {}, entryKeys -> {} => count -> {}", key, entryKeys, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -981,7 +852,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 查看(key对应的)hash中，是否存在entryKey对应的entry
-         *
          * 注: 若redis中不存在key,则返回false。
          * 注: 若key对应的hash中不存在对应的entryKey, 也会返回false。
          *
@@ -991,18 +861,15 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位hash中entry的entryKey
          *
          * @return  hash中是否存在entryKey对应的entry.
-         * @date 2020/3/9 9:51:55
          */
         public static boolean hExists(String key, String entryKey) {
-            log.debug("hDelete(...) => key -> {}, entryKeys -> {}", key, entryKey);
             Boolean exist = redisTemplate.opsForHash().hasKey(key, entryKey);
-            log.debug("hDelete(...) => exist -> {}", exist);
+            log.debug("hDelete key -> {}, entryKeys -> {} => exist -> {}", key, entryKey, exist);
             return exist;
         }
 
         /**
          * 增/减(hash中的某个entryValue值) 整数
-         *
          * 注: 负数则为减。
          * 注: 若key不存在，那么会自动创建对应的hash,并创建对应的entryKey、entryValue,entryValue的初始值为increment。
          * 注: 若entryKey不存在，那么会自动创建对应的entryValue,entryValue的初始值为increment。
@@ -1017,13 +884,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            增加多少
          * @return  增加后的总值。
          * @throws RedisSystemException key对应的value值不支持增/减操作时
-         * @date 2020/3/9 10:09:28
          */
         public static long hIncrBy(String key, Object entryKey, long increment) {
-            log.debug("hIncrBy(...) => key -> {}, entryKey -> {}, increment -> {}",
-                    key, entryKey, increment);
             Long result = redisTemplate.opsForHash().increment(key, entryKey, increment);
-            log.debug("hIncrBy(...) => result -> {}", result);
+            log.debug("hIncrBy key -> {}, entryKey -> {}, increment -> {} => result -> {}"
+                    , key, entryKey, increment, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1032,7 +897,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 增/减(hash中的某个entryValue值) 浮点数
-         *
          * 注: 负数则为减。
          * 注: 若key不存在，那么会自动创建对应的hash,并创建对应的entryKey、entryValue,entryValue的初始值为increment。
          * 注: 若entryKey不存在，那么会自动创建对应的entryValue,entryValue的初始值为increment。
@@ -1049,13 +913,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            增加多少
          * @return  增加后的总值。
          * @throws RedisSystemException key对应的value值不支持增/减操作时
-         * @date 2020/3/9 10:09:28
          */
         public static double hIncrByFloat(String key, Object entryKey, double increment) {
-            log.debug("hIncrByFloat(...) => key -> {}, entryKey -> {}, increment -> {}",
-                    key, entryKey, increment);
             Double result = redisTemplate.opsForHash().increment(key, entryKey, increment);
-            log.debug("hIncrByFloat(...) => result -> {}", result);
+            log.debug("hIncrByFloat key -> {}, entryKey -> {}, increment -> {} => result -> {}"
+                    , key, entryKey, increment, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1064,55 +926,46 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取(key对应的)hash中的所有entryKey
-         *
          * 注: 若key不存在，则返回的是一个空的Set(，而不是返回null)
          *
          * @param key
          *            定位hash的key
          *
          * @return  hash中的所有entryKey
-         * @date 2020/3/9 10:30:13
          */
         public static Set<Object> hKeys(String key) {
-            log.debug("hKeys(...) => key -> {}", key);
             Set<Object> entryKeys = redisTemplate.opsForHash().keys(key);
-            log.debug("hKeys(...) => entryKeys -> {}", entryKeys);
+            log.debug("hKeys key -> {} => entryKeys -> {}", key, entryKeys);
             return entryKeys;
         }
 
         /**
          * 获取(key对应的)hash中的所有entryValue
-         *
          * 注: 若key不存在，则返回的是一个空的List(，而不是返回null)
          *
          * @param key
          *            定位hash的key
          *
          * @return  hash中的所有entryValue
-         * @date 2020/3/9 10:30:13
          */
         public static List<Object> hValues(String key) {
-            log.debug("hValues(...) => key -> {}", key);
             List<Object> entryValues = redisTemplate.opsForHash().values(key);
-            log.debug("hValues(...) => entryValues -> {}", entryValues);
+            log.debug("hValues key -> {} => entryValues -> {}", key, entryValues);
             return entryValues;
         }
 
         /**
          * 获取(key对应的)hash中的所有entry的数量
-         *
          * 注: 若redis中不存在对应的key, 则返回值为0
          *
          * @param key
          *            定位hash的key
          *
          * @return  (key对应的)hash中,entry的个数
-         * @date 2020/3/9 10:41:01
          */
         public static long hSize(String key) {
-            log.debug("hSize(...) => key -> {}", key);
             Long count = redisTemplate.opsForHash().size(key);
-            log.debug("hSize(...) => count -> {}", count);
+            log.debug("hSize key -> {} => count -> {}", key, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1121,8 +974,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 根据options匹配到(key对应的)hash中的对应的entryKey, 并返回对应的entry集
-         *
-         *
          * 注: ScanOptions实例的创建方式举例:
          *     1、ScanOptions.NONE
          *     2、ScanOptions.scanOptions().match("n??e").build()
@@ -1139,38 +990,28 @@ public class RedisUtil implements ApplicationContextAware {
          *                此处的匹配规则与{@link KeyOps#keys(String)}处的一样。
          *
          * @return  匹配到的(key对应的)hash中的entry
-         * @date 2020/3/9 10:49:27
          */
         public static Cursor<Entry<Object, Object>> hScan(String key, ScanOptions options) {
-            log.debug("hScan(...) => key -> {}, options -> {}", key, JSON.toJSONString(options));
             Cursor<Entry<Object, Object>> cursor = redisTemplate.opsForHash().scan(key, options);
-            log.debug("hScan(...) => cursor -> {}", JSON.toJSONString(cursor));
+            log.debug("hScan key -> {}, options -> {} => cursor -> {}", key, JSON.toJSONString(options), JSON.toJSONString(cursor));
             return cursor;
         }
     }
 
     /**
      * list相关操作
-     *
      * 提示: 列表中的元素，可以重复。
-     *
      * 提示: list是有序的。
-     *
      * 提示: redis中的list中的索引，可分为两类,这两类都可以用来定位list中元素:
      *      类别一: 从left到right, 是从0开始依次增大:   0,  1,  2,  3...
      *      类别二: 从right到left, 是从-1开始依次减小: -1, -2, -3, -4...
-     *
      * 提示: redis中String的数据结构可参考resources/data-structure/List(列表)的数据结构(示例一).png
      *      redis中String的数据结构可参考resources/data-structure/List(列表)的数据结构(示例二).png
-     *
-     * @author JustryDeng
-     * @date 2020/3/9 11:30:48
      */
     public static class ListOps {
 
         /**
          * 从左端推入元素进列表
-         *
          * 注: 若redis中不存在对应的key, 那么会自动创建
          *
          * @param key
@@ -1179,12 +1020,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要推入list的元素
          *
          * @return 推入后，(key对应的)list的size
-         * @date 2020/3/9 11:56:05
          */
         public static long lLeftPush(String key, String item) {
-            log.debug("lLeftPush(...) => key -> {}, item -> {}", key, item);
             Long size = redisTemplate.opsForList().leftPush(key, item);
-            log.debug("lLeftPush(...) => size -> {}", size);
+            log.debug("lLeftPush key -> {}, item -> {} => size -> {}", key, item, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1193,7 +1032,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从左端批量推入元素进列表
-         *
          * 注: 若redis中不存在对应的key, 那么会自动创建
          * 注: 这一批item中，先push左侧的, 后push右侧的
          *
@@ -1203,12 +1041,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要批量推入list的元素集
          *
          * @return 推入后，(key对应的)list的size
-         * @date 2020/3/9 11:56:05
          */
         public static long lLeftPushAll(String key, String... items) {
-            log.debug("lLeftPushAll(...) => key -> {}, items -> {}", key, items);
             Long size = redisTemplate.opsForList().leftPushAll(key, items);
-            log.debug("lLeftPushAll(...) => size -> {}", size);
+            log.debug("lLeftPushAll key -> {}, items -> {} => size -> {}", key, items, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1217,7 +1053,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从左端批量推入元素进列表
-         *
          * 注: 若redis中不存在对应的key, 那么会自动创建
          * 注: 这一批item中，那个item先从Collection取出来，就先push哪个
          *
@@ -1227,12 +1062,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要批量推入list的元素集
          *
          * @return 推入后，(key对应的)list的size
-         * @date 2020/3/9 11:56:05
          */
         public static long lLeftPushAll(String key, Collection<String> items) {
-            log.debug("lLeftPushAll(...) => key -> {}, items -> {}", key, items);
             Long size = redisTemplate.opsForList().leftPushAll(key, items);
-            log.debug("lLeftPushAll(...) => size -> {}", size);
+            log.debug("lLeftPushAll key -> {}, items -> {} => size -> {}", key, items, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1249,12 +1082,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要推入list的项
          *
          * @return  推入后，(key对应的)list的size
-         * @date 2020/3/9 13:40:08
          */
         public static long lLeftPushIfPresent(String key, String item) {
-            log.debug("lLeftPushIfPresent(...) => key -> {}, item -> {}", key, item);
             Long size = redisTemplate.opsForList().leftPushIfPresent(key, item);
-            log.debug("lLeftPushIfPresent(...) => size -> {}", size);
+            log.debug("lLeftPushIfPresent key -> {}, item -> {} => size -> {}", key, item, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1264,7 +1095,6 @@ public class RedisUtil implements ApplicationContextAware {
         /**
          * 若key对应的list中存在pivot项, 那么将item放入第一个pivot项前(即:放在第一个pivot项左边);
          * 若key对应的list中不存在pivot项, 那么不做任何操作， 直接返回-1。
-         *
          * 注: 若redis中不存在对应的key, 那么会自动创建
          *
          * @param key
@@ -1273,12 +1103,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要推入list的元素
          *
          * @return 推入后，(key对应的)list的size
-         * @date 2020/3/9 11:56:05
          */
         public static long lLeftPush(String key, String pivot, String item) {
-            log.debug("lLeftPush(...) => key -> {}, pivot -> {}, item -> {}", key, pivot, item);
             Long size = redisTemplate.opsForList().leftPush(key, pivot, item);
-            log.debug("lLeftPush(...) => size -> {}", size);
+            log.debug("lLeftPush key -> {}, pivot -> {}, item -> {} => size -> {}", key, pivot, item, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1289,9 +1117,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPush(String, String)}类比即可， 不过是从list右侧推入元素
          */
         public static long lRightPush(String key, String item) {
-            log.debug("lRightPush(...) => key -> {}, item -> {}", key, item);
             Long size = redisTemplate.opsForList().rightPush(key, item);
-            log.debug("lRightPush(...) => size -> {}", size);
+            log.debug("lRightPush  key -> {}, item -> {} => size -> {}", key, item, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1302,9 +1129,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPushAll(String, String...)}类比即可， 不过是从list右侧推入元素
          */
         public static long lRightPushAll(String key, String... items) {
-            log.debug("lRightPushAll(...) => key -> {}, items -> {}", key, items);
             Long size = redisTemplate.opsForList().rightPushAll(key, items);
-            log.debug("lRightPushAll(...) => size -> {}", size);
+            log.debug("lRightPushAll key -> {}, items -> {} => size -> {}", key, items, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1315,9 +1141,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPushAll(String, Collection<String>)}类比即可， 不过是从list右侧推入元素
          */
         public static long lRightPushAll(String key, Collection<String> items) {
-            log.debug("lRightPushAll(...) => key -> {}, items -> {}", key, items);
             Long size = redisTemplate.opsForList().rightPushAll(key, items);
-            log.debug("lRightPushAll(...) => size -> {}", size);
+            log.debug("lRightPushAll key -> {}, items -> {} => size -> {}", key, items, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1328,9 +1153,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPushIfPresent(String, String)}类比即可， 不过是从list右侧推入元素
          */
         public static long lRightPushIfPresent(String key, String item) {
-            log.debug("lRightPushIfPresent(...) => key -> {}, item -> {}", key, item);
             Long size = redisTemplate.opsForList().rightPushIfPresent(key, item);
-            log.debug("lRightPushIfPresent(...) => size -> {}", size);
+            log.debug("lRightPushIfPresent key -> {}, item -> {} => size -> {}", key, item, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1341,9 +1165,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPush(String, String, String)}类比即可， 不过是从list右侧推入元素
          */
         public static long lRightPush(String key, String pivot, String item) {
-            log.debug("lLeftPush(...) => key -> {}, pivot -> {}, item -> {}", key, pivot, item);
             Long size = redisTemplate.opsForList().rightPush(key, pivot, item);
-            log.debug("lLeftPush(...) => size -> {}",  size);
+            log.debug("lLeftPush key -> {}, pivot -> {}, item -> {} => size -> {}", key, pivot, item,  size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1352,7 +1175,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 【非阻塞队列】 从左侧移出(key对应的)list中的第一个元素, 并将该元素返回
-         *
          * 注: 此方法是非阻塞的， 即: 若(key对应的)list中的所有元素都被pop移出了，此时，再进行pop的话，会立即返回null
          * 注: 此方法是非阻塞的， 即: 若redis中不存在对应的key,那么会立即返回null
          * 注: 若将(key对应的)list中的所有元素都pop完了，那么该key会被删除
@@ -1360,23 +1182,19 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            定位list的key
          * @return  移出的那个元素
-         * @date 2020/3/9 14:33:56
          */
         public static String lLeftPop(String key) {
-            log.debug("lLeftPop(...) => key -> {}", key);
             String item = redisTemplate.opsForList().leftPop(key);
-            log.debug("lLeftPop(...) => item -> {}", item);
+            log.debug("lLeftPop key -> {} => item -> {}", key, item);
             return item;
         }
 
         /**
          * 【阻塞队列】 从左侧移出(key对应的)list中的第一个元素, 并将该元素返回
-         *
          * 注: 此方法是阻塞的， 即: 若(key对应的)list中的所有元素都被pop移出了，此时，再进行pop的话，
          *     会阻塞timeout这么久，然后返回null
          * 注: 此方法是阻塞的， 即: 若redis中不存在对应的key,那么会阻塞timeout这么久，然后返回null
          * 注: 若将(key对应的)list中的所有元素都pop完了，那么该key会被删除
-         *
          * 提示: 若阻塞过程中， 目标key-list出现了，且里面有item了，那么会立马停止阻塞, 进行元素移出并返回
          *
          * @param key
@@ -1386,12 +1204,10 @@ public class RedisUtil implements ApplicationContextAware {
          * @param unit
          *            timeout的单位
          * @return  移出的那个元素
-         * @date 2020/3/9 14:33:56
          */
         public static String lLeftPop(String key, long timeout, TimeUnit unit) {
-            log.debug("lLeftPop(...) => key -> {}, timeout -> {}, unit -> {}", key, timeout, unit);
             String item = redisTemplate.opsForList().leftPop(key, timeout, unit);
-            log.debug("lLeftPop(...) => item -> {}", item);
+            log.debug("lLeftPop key -> {}, timeout -> {}, unit -> {} => item -> {}", key, timeout, unit, item);
             return item;
         }
 
@@ -1399,9 +1215,8 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPop(String)}类比即可， 不过是从list右侧移出元素
          */
         public static String lRightPop(String key) {
-            log.debug("lRightPop(...) => key -> {}", key);
             String item = redisTemplate.opsForList().rightPop(key);
-            log.debug("lRightPop(...) => item -> {}", item);
+            log.debug("lRightPop key -> {} => item -> {}", key, item);
             return item;
         }
 
@@ -1409,20 +1224,17 @@ public class RedisUtil implements ApplicationContextAware {
          * 与{@link ListOps#lLeftPop(String, long, TimeUnit)}类比即可， 不过是从list右侧移出元素
          */
         public static String lRightPop(String key, long timeout, TimeUnit unit) {
-            log.debug("lRightPop(...) => key -> {}, timeout -> {}, unit -> {}", key, timeout, unit);
             String item = redisTemplate.opsForList().rightPop(key, timeout, unit);
-            log.debug("lRightPop(...) => item -> {}", item);
+            log.debug("lRightPop key -> {}, timeout -> {}, unit -> {} => item -> {}", key, timeout, unit, item);
             return item;
         }
 
         /**
          * 【非阻塞队列】 从sourceKey对应的sourceList右侧移出一个item, 并将这个item推
          *              入(destinationKey对应的)destinationList的左侧
-         *
          * 注: 若sourceKey对应的list中没有item了，则立马认为(从sourceKey对应的list中pop出来的)item为null,
          *     null并不会往destinationKey对应的list中push。
          *     追注: 此时，此方法的返回值是null。
-         *
          * 注: 若将(sourceKey对应的)list中的所有元素都pop完了，那么该sourceKey会被删除。
          *
          * @param sourceKey
@@ -1431,25 +1243,21 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位destinationList的key
          *
          * @return 移动的这个元素
-         * @date 2020/3/9 15:06:59
          */
         public static String lRightPopAndLeftPush(String sourceKey, String destinationKey) {
-            log.debug("lRightPopAndLeftPush(...) => sourceKey -> {}, destinationKey -> {}",
-                    sourceKey, destinationKey);
             String item = redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey);
-            log.debug("lRightPopAndLeftPush(...) => item -> {}", item);
+            log.debug("lRightPopAndLeftPush sourceKey -> {}, destinationKey -> {} => item -> {}"
+                    , sourceKey, destinationKey, item);
             return item;
         }
 
         /**
          * 【阻塞队列】 从sourceKey对应的sourceList右侧移出一个item, 并将这个item推
          *            入(destinationKey对应的)destinationList的左侧
-         *
          * 注: 若sourceKey对应的list中没有item了，则阻塞等待, 直到能从sourceList中移出一个非null的item(或等待时长超时);
          *     case1: 等到了一个非null的item, 那么继续下面的push操作，并返回这个item。
          *     case2: 超时了，还没等到非null的item, 那么pop出的结果就未null,此时并不会往destinationList进行push。
          *            此时，此方法的返回值是null。
-         *
          * 注: 若将(sourceKey对应的)list中的所有元素都pop完了，那么该sourceKey会被删除。
          *
          * @param sourceKey
@@ -1462,20 +1270,17 @@ public class RedisUtil implements ApplicationContextAware {
          *            timeout的单位
          *
          * @return 移动的这个元素
-         * @date 2020/3/9 15:06:59
          */
         public static String lRightPopAndLeftPush(String sourceKey, String destinationKey, long timeout,
                                                   TimeUnit unit) {
-            log.debug("lRightPopAndLeftPush(...) => sourceKey -> {}, destinationKey -> {}, timeout -> {},"
-                    + " unit -> {}", sourceKey, destinationKey, timeout, unit);
             String item = redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey, timeout, unit);
-            log.debug("lRightPopAndLeftPush(...) => item -> {}", item);
+            log.debug("lRightPopAndLeftPush sourceKey -> {}, destinationKey -> {}, timeout -> {}, unit -> {} => item -> {}"
+                    , sourceKey, destinationKey, timeout, unit, item);
             return item;
         }
 
         /**
          * 设置(key对应的)list中对应索引位置index处的元素为item
-         *
          * 注: 若key不存在，则会抛出org.springframework.data.redis.RedisSystemException
          * 注: 若索引越界，也会抛出org.springframework.data.redis.RedisSystemException
          *
@@ -1485,16 +1290,14 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位list中的元素的索引
          * @param item
          *            要替换成的值
-         * @date 2020/3/9 15:39:50
          */
         public static void lSet(String key, long index, String item) {
-            log.debug("lSet(...) => key -> {}, index -> {}, item -> {}", key, index, item);
+            log.debug("lSet => key -> {}, index -> {}, item -> {}", key, index, item);
             redisTemplate.opsForList().set(key, index, item);
         }
 
         /**
          * 通过索引index, 获取(key对应的)list中的元素
-         *
          * 注: 若key不存在 或 index超出(key对应的)list的索引范围，那么返回null
          *
          * @param key
@@ -1503,22 +1306,18 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位list中的item的索引
          *
          * @return  list中索引index对应的item
-         * @date 2020/3/10 0:27:23
          */
         public static String lIndex(String key, long index) {
-            log.debug("lIndex(...) => key -> {}, index -> {}", key, index);
             String item = redisTemplate.opsForList().index(key, index);
-            log.debug("lIndex(...) => item -> {}", item);
+            log.debug("lIndex key -> {}, index -> {} => item -> {}", key, index, item);
             return item;
         }
 
         /**
          * 获取(key对应的)list中索引在[start, end]之间的item集
-         *
          * 注: 含start、含end。
          * 注: 当key不存在时，获取到的是空的集合。
          * 注: 当获取的范围比list的范围还要大时，获取到的是这两个范围的交集。
-         *
          * 提示: 可通过RedisUtil.ListOps.lRange(key, 0, -1)来获取到该key对应的整个list
          *
          * @param key
@@ -1529,12 +1328,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            结尾元素的index
          *
          * @return  对应的元素集合
-         * @date 2020/3/10 0:34:59
          */
         public static List<String> lRange(String key, long start, long end) {
-            log.debug("lRange(...) => key -> {}, start -> {}, end -> {}", key, start, end);
             List<String> result = redisTemplate.opsForList().range(key, start, end);
-            log.debug("lRange(...) => result -> {}", result);
+            log.debug("lRange key -> {}, start -> {}, end -> {} => result -> {}", key, start, end, result);
             return result;
         }
 
@@ -1546,31 +1343,25 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            定位list的key
          * @return  (key对应的)list
-         * @date 2020/3/10 0:46:50
          */
         public static List<String> lWholeList(String key) {
-            log.debug("lWholeList(...) => key -> {}", key);
             List<String> result = redisTemplate.opsForList().range(key, 0, -1);
-            log.debug("lWholeList(...) => result -> {}", result);
+            log.debug("lWholeList key -> {} => result -> {}", key, result);
             return result;
         }
 
         /**
          * 获取(key对应的)list的size
-         *
          * 注: 当key不存在时，获取到的size为0.
          *
          * @param key
          *            定位list的key
          *
-         * @return list的size。
-         *
-         * @date 2020/3/10 0:48:40
+         * @return list的size
          */
         public static long lSize(String key) {
-            log.debug("lSize(...) => key -> {}", key);
             Long size = redisTemplate.opsForList().size(key);
-            log.debug("lSize(...) => size -> {}", size);
+            log.debug("lSize key -> {} => size -> {}", key, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1579,11 +1370,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 删除(key对应的)list中，前expectCount个值等于item的项
-         *
          * 注: 若expectCount == 0， 则表示删除list中所有的值等于item的项.
          * 注: 若expectCount > 0，  则表示删除从左往右进行
          * 注: 若expectCount < 0，  则表示删除从右往左进行
-         *
          * 注: 若list中,值等于item的项的个数少于expectCount时，那么会删除list中所有的值等于item的项。
          * 注: 当key不存在时, 返回0。
          * 注: 若lRemove后， 将(key对应的)list中没有任何元素了，那么该key会被删除。
@@ -1599,9 +1388,8 @@ public class RedisUtil implements ApplicationContextAware {
          * @date 2020/3/10 0:52:57
          */
         public static long lRemove(String key, long expectCount, String item) {
-            log.debug("lRemove(...) => key -> {}, expectCount -> {}, item -> {}", key, expectCount, item);
             Long actualCount = redisTemplate.opsForList().remove(key, expectCount, item);
-            log.debug("lRemove(...) => actualCount -> {}", actualCount);
+            log.debug("lRemove key -> {}, expectCount -> {}, item -> {} => actualCount -> {}", key, expectCount, item, actualCount);
             if (actualCount == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1610,11 +1398,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 裁剪(即: 对list中的元素取交集。)
-         *
          * 举例说明: list中的元素索引范围是[0, 8], 而这个方法传入的[start, end]为 [3, 10]，
          *          那么裁剪就是对[0, 8]和[3, 10]进行取交集， 得到[3, 8], 那么裁剪后
          *          的list中，只剩下(原来裁剪前)索引在[3, 8]之间的元素了。
-         *
          * 注: 若裁剪后的(key对应的)list就是空的,那么该key会被删除。
          *
          * @param key
@@ -1623,10 +1409,9 @@ public class RedisUtil implements ApplicationContextAware {
          *            要删除的item集的起始项的索引
          * @param end
          *            要删除的item集的结尾项的索引
-         * @date 2020/3/10 1:16:58
          */
         public static void lTrim(String key, long start, long end) {
-            log.debug("lTrim(...) => key -> {}, start -> {}, end -> {}", key, start, end);
+            log.debug("lTrim => key -> {}, start -> {}, end -> {}", key, start, end);
             redisTemplate.opsForList().trim(key, start, end);
         }
 
@@ -1634,20 +1419,15 @@ public class RedisUtil implements ApplicationContextAware {
 
     /**
      * set相关操作
-     *
      * 提示: set中的元素，不可以重复。
      * 提示: set是无序的。
      * 提示: redis中String的数据结构可参考resources/data-structure/Set(集合)的数据结构(示例一).png
      *      redis中String的数据结构可参考resources/data-structure/Set(集合)的数据结构(示例二).png
-     *
-     * @author JustryDeng
-     * @date 2020/3/9 11:30:48
      */
     public static class SetOps {
 
         /**
          * 向(key对应的)set中添加items
-         *
          * 注: 若key不存在，则会自动创建。
          * 注: set中的元素会去重。
          *
@@ -1657,12 +1437,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要向(key对应的)set中添加的items
          *
          * @return 此次添加操作,添加到set中的元素的个数
-         * @date 2020/3/11 8:16:00
          */
         public static long sAdd(String key, String... items) {
-            log.debug("sAdd(...) => key -> {}, items -> {}", key, items);
             Long count = redisTemplate.opsForSet().add(key, items);
-            log.debug("sAdd(...) => count -> {}", count);
+            log.debug("sAdd key -> {}, items -> {} => count -> {}", key, items, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1671,7 +1449,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从(key对应的)set中删除items
-         *
          * 注: 若key不存在, 则返回0。
          * 注: 若已经将(key对应的)set中的项删除完了，那么对应的key也会被删除。
          *
@@ -1681,12 +1458,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要移除的items
          *
          * @return 实际删除了的个数
-         * @date 2020/3/11 8:26:43
          */
         public static long sRemove(String key, Object... items) {
-            log.debug("sRemove(...) => key -> {}, items -> {}", key, items);
             Long count = redisTemplate.opsForSet().remove(key, items);
-            log.debug("sRemove(...) => count -> {}", count);
+            log.debug("sRemove key -> {}, items -> {} => count -> {}", key, items, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1695,28 +1470,23 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从(key对应的)set中随机移出一个item, 并返回这个item
-         *
          * 注: 因为set是无序的，所以移出的这个item,是随机的; 并且，哪怕
          *     是数据一样的set,多次测试移出操作,移除的元素也是随机的。
-         *
          * 注: 若已经将(key对应的)set中的项pop完了，那么对应的key会被删除。
          *
          * @param key
          *            定位set的key
          *
          * @return  移出的项
-         * @date 2020/3/11 8:32:40
          */
         public static String sPop(String key) {
-            log.debug("sPop(...) => key -> {}", key);
             String popItem = redisTemplate.opsForSet().pop(key);
-            log.debug("sPop(...) => popItem -> {}", popItem);
+            log.debug("sPop key -> {} => popItem -> {}", key, popItem);
             return popItem;
         }
 
         /**
          * 将(sourceKey对应的)sourceSet中的元素item, 移动到(destinationKey对应的)destinationSet中
-         *
          * 注: 当sourceKey不存在时， 返回false
          * 注: 当item不存在时， 返回false
          * 注: 若destinationKey不存在， 那么在移动时会自动创建
@@ -1730,13 +1500,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位destinationSet的key
          *
          * @return  移动成功与否
-         * @date 2020/3/11 8:43:32
          */
         public static boolean sMove(String sourceKey, String item, String destinationKey) {
             Boolean result = redisTemplate.opsForSet().move(sourceKey, item, destinationKey);
-            log.debug("sMove(...) => sourceKey -> {}, destinationKey -> {}, item -> {}",
-                    sourceKey, destinationKey, item);
-            log.debug("sMove(...) =>  result -> {}", result);
+            log.debug("sMove sourceKey -> {}, destinationKey -> {}, item -> {} =>  result -> {}"
+                    , sourceKey, destinationKey, item, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1745,19 +1513,16 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取(key对应的)set中的元素个数
-         *
          * 注: 若key不存在，则返回0
          *
          * @param key
          *            定位set的key
          *
          * @return  (key对应的)set中的元素个数
-         * @date 2020/3/11 8:57:19
          */
         public static long sSize(String key) {
-            log.debug("sSize(...) => key -> {}", key);
             Long size = redisTemplate.opsForSet().size(key);
-            log.debug("sSize(...) => size -> {}", size);
+            log.debug("sSize key -> {} => size -> {}", key, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1766,7 +1531,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 判断(key对应的)set中是否含有item
-         *
          * 注: 若key不存在，则返回false。
          *
          * @param key
@@ -1775,12 +1539,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            被查找的项
          *
          * @return  (key对应的)set中是否含有item
-         * @date 2020/3/11 9:03:29
          */
         public static boolean sIsMember(String key, Object item) {
-            log.debug("sSize(...) => key -> {}, size -> {}", key, item);
             Boolean result = redisTemplate.opsForSet().isMember(key, item);
-            log.debug("sSize(...) => result -> {}", result);
+            log.debug("sSize key -> {}, size -> {} => result -> {}", key, item, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1789,7 +1551,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)Set的交集
-         *
          * 注: 若不存在任何交集，那么返回空的集合(, 而不是null)
          * 注: 若其中一个key不存在(或两个key都不存在)，那么返回空的集合(, 而不是null)
          *
@@ -1799,18 +1560,15 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位其中另一个set的键
          *
          * @return  item交集
-         * @date 2020/3/11 9:31:25
          */
         public static Set<String> sIntersect(String key, String otherKey) {
-            log.debug("sIntersect(...) => key -> {}, otherKey -> {}", key, otherKey);
             Set<String> intersectResult = redisTemplate.opsForSet().intersect(key, otherKey);
-            log.debug("sIntersect(...) => intersectResult -> {}", intersectResult);
+            log.debug("sIntersect key -> {}, otherKey -> {} => intersectResult -> {}", key, otherKey, intersectResult);
             return intersectResult;
         }
 
         /**
          * 获取多个(key对应的)Set的交集
-         *
          * 注: 若不存在任何交集，那么返回空的集合(, 而不是null)
          * 注: 若>=1个key不存在，那么返回空的集合(, 而不是null)
          *
@@ -1820,22 +1578,18 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位其它set的键集
          *
          * @return  item交集
-         * @date 2020/3/11 9:39:23
          */
         public static Set<String> sIntersect(String key, Collection<String> otherKeys) {
-            log.debug("sIntersect(...) => key -> {}, otherKeys -> {}", key, otherKeys);
             Set<String> intersectResult = redisTemplate.opsForSet().intersect(key, otherKeys);
-            log.debug("sIntersect(...) => intersectResult -> {}", intersectResult);
+            log.debug("sIntersect key -> {}, otherKeys -> {} => intersectResult -> {}", key, otherKeys, intersectResult);
             return intersectResult;
         }
 
         /**
          * 获取两个(key对应的)Set的交集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 交集不为空, storeKey不存在， 则 会创建对应的storeKey，并将交集添加到(storeKey对应的)set中
          * case2: 交集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将交集添加到(storeKey对应的)set中
          * case3: 交集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求交集的部分，详见{@link SetOps#sIntersect(String, String)}
          *
          * @param key
@@ -1846,13 +1600,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把交集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)Set后, 该set对应的size
-         * @date 2020/3/11 9:46:46
          */
         public static long sIntersectAndStore(String key, String otherKey, String storeKey) {
-            log.debug("sIntersectAndStore(...) => key -> {}, otherKey -> {}, storeKey -> {}",
-                    key, otherKey, storeKey);
             Long size = redisTemplate.opsForSet().intersectAndStore(key, otherKey, storeKey);
-            log.debug("sIntersectAndStore(...) => size -> {}", size);
+            log.debug("sIntersectAndStore key -> {}, otherKey -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKey, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1861,19 +1613,15 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取多个(key对应的)Set的交集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 交集不为空, storeKey不存在， 则 会创建对应的storeKey，并将交集添加到(storeKey对应的)set中
          * case2: 交集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将交集添加到(storeKey对应的)set中
          * case3: 交集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求交集的部分，详见{@link SetOps#sIntersect(String, Collection)}
-         *
-         * @date 2020/3/11 11:04:29
          */
         public static long sIntersectAndStore(String key, Collection<String> otherKeys, String storeKey) {
-            log.debug("sIntersectAndStore(...) => key -> {}, otherKeys -> {}, storeKey -> {}", key, otherKeys, storeKey);
             Long size = redisTemplate.opsForSet().intersectAndStore(key, otherKeys, storeKey);
-            log.debug("sIntersectAndStore(...) => size -> {}", size);
+            log.debug("sIntersectAndStore key -> {}, otherKeys -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKeys, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1882,7 +1630,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)Set的并集
-         *
          * 注: 并集中的元素也是唯一的，这是Set保证的。
          *
          * @param key
@@ -1891,18 +1638,15 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位其中另一个set的键
          *
          * @return item并集
-         * @date 2020/3/11 11:18:35
          */
         public static Set<String> sUnion(String key, String otherKey) {
-            log.debug("sUnion(...) => key -> {}, otherKey -> {}", key, otherKey);
             Set<String> unionResult = redisTemplate.opsForSet().union(key, otherKey);
-            log.debug("sUnion(...) => unionResult -> {}", unionResult);
+            log.debug("sUnion key -> {}, otherKey -> {} => unionResult -> {}", key, otherKey, unionResult);
             return unionResult;
         }
 
         /**
          * 获取两个(key对应的)Set的并集
-         *
          * 注: 并集中的元素也是唯一的，这是Set保证的。
          *
          * @param key
@@ -1911,22 +1655,18 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位其它set的键集
          *
          * @return item并集
-         * @date 2020/3/11 11:18:35
          */
         public static Set<String> sUnion(String key, Collection<String> otherKeys) {
-            log.debug("sUnion(...) => key -> {}, otherKeys -> {}", key, otherKeys);
             Set<String> unionResult = redisTemplate.opsForSet().union(key, otherKeys);
-            log.debug("sUnion(...) => unionResult -> {}", unionResult);
+            log.debug("sUnion key -> {}, otherKeys -> {} => unionResult -> {}", key, otherKeys, unionResult);
             return unionResult;
         }
 
         /**
          * 获取两个(key对应的)Set的并集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 并集不为空, storeKey不存在， 则 会创建对应的storeKey，并将并集添加到(storeKey对应的)set中
          * case2: 并集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将并集添加到(storeKey对应的)set中
          * case3: 并集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求并集的部分，详见{@link SetOps#sUnion(String, String)}
          *
          * @param key
@@ -1937,13 +1677,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把并集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)Set后, 该set对应的size
-         * @date 2020/3/11 12:26:24
          */
         public static long sUnionAndStore(String key, String otherKey, String storeKey) {
-            log.debug("sUnionAndStore(...) => key -> {}, otherKey -> {}, storeKey -> {}",
-                    key, otherKey, storeKey);
             Long size = redisTemplate.opsForSet().unionAndStore(key, otherKey, storeKey);
-            log.debug("sUnionAndStore(...) => size -> {}", size);
+            log.debug("sUnionAndStore key -> {}, otherKey -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKey, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1952,11 +1690,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)Set的并集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 并集不为空, storeKey不存在， 则 会创建对应的storeKey，并将并集添加到(storeKey对应的)set中
          * case2: 并集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将并集添加到(storeKey对应的)set中
          * case3: 并集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求并集的部分，详见{@link SetOps#sUnion(String, Collection)}
          *
          * @param key
@@ -1967,13 +1703,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把并集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)Set后, 该set对应的size
-         * @date 2020/3/11 12:26:24
          */
         public static long sUnionAndStore(String key, Collection<String> otherKeys, String storeKey) {
-            log.debug("sUnionAndStore(...) => key -> {}, otherKeys -> {}, storeKey -> {}",
-                    key, otherKeys, storeKey);
             Long size = redisTemplate.opsForSet().unionAndStore(key, otherKeys, storeKey);
-            log.debug("sUnionAndStore(...) => size -> {}", size);
+            log.debug("sUnionAndStore key -> {}, otherKeys -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKeys, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -1982,7 +1716,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取 (key对应的)Set 减去 (otherKey对应的)Set 的差集
-         *
          * 注: 如果被减数key不存在， 那么结果为空的集合(，而不是null)
          * 注: 如果被减数key存在，但减数key不存在， 那么结果即为(被减数key对应的)Set
          *
@@ -1992,22 +1725,17 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位"减数set"的键
          *
          * @return item差集
-         * @date 2020/3/11 14:03:57
          */
         public static Set<String> sDifference(String key, String otherKey) {
-            log.debug("sDifference(...) => key -> {}, otherKey -> {}",
-                    key, otherKey);
             Set<String> differenceResult = redisTemplate.opsForSet().difference(key, otherKey);
-            log.debug("sDifference(...) => differenceResult -> {}", differenceResult);
+            log.debug("sDifference key -> {}, otherKey -> {} => differenceResult -> {}", key, otherKey, differenceResult);
             return differenceResult;
         }
 
         /**
          * 获取 (key对应的)Set 减去 (otherKeys对应的)Sets 的差集
-         *
          * 注: 如果被减数key不存在， 那么结果为空的集合(，而不是null)
          * 注: 如果被减数key存在，但减数key不存在， 那么结果即为(被减数key对应的)Set
-         *
          * 提示: 当有多个减数时， 被减数先减去哪一个减数，后减去哪一个减数，是无所谓的，是不影响最终结果的。
          *
          * @param key
@@ -2016,22 +1744,18 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位"减数集sets"的键集
          *
          * @return item差集
-         * @date 2020/3/11 14:03:57
          */
         public static Set<String> sDifference(String key, Collection<String> otherKeys) {
-            log.debug("sDifference(...) => key -> {}, otherKeys -> {}", key, otherKeys);
             Set<String> differenceResult = redisTemplate.opsForSet().difference(key, otherKeys);
-            log.debug("sDifference(...) => differenceResult -> {}", differenceResult);
+            log.debug("sDifference key -> {}, otherKeys -> {} => differenceResult -> {}", key, otherKeys, differenceResult);
             return differenceResult;
         }
 
         /**
          * 获取 (key对应的)Set 减去 (otherKey对应的)Set 的差集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 差集不为空, storeKey不存在， 则 会创建对应的storeKey，并将差集添加到(storeKey对应的)set中
          * case2: 差集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将差集添加到(storeKey对应的)set中
          * case3: 差集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求并集的部分，详见{@link SetOps#sDifference(String, String)}
          *
          * @param key
@@ -2042,13 +1766,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把差集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)Set后, 该set对应的size
-         * @date 2020/3/11 14:33:36
          */
         public static long sDifferenceAndStore(String key, String otherKey, String storeKey) {
-            log.debug("sDifferenceAndStore(...) => key -> {}, otherKey -> {}, storeKey -> {}",
-                    key, otherKey, storeKey);
             Long size = redisTemplate.opsForSet().differenceAndStore(key, otherKey, storeKey);
-            log.debug("sDifferenceAndStore(...) => size -> {}", size);
+            log.debug("sDifferenceAndStore key -> {}, otherKey -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKey, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2057,11 +1779,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取 (key对应的)Set 减去 (otherKey对应的)Set 的差集, 并将结果add到storeKey对应的Set中。
-         *
          * case1: 差集不为空, storeKey不存在， 则 会创建对应的storeKey，并将差集添加到(storeKey对应的)set中
          * case2: 差集不为空, storeKey已存在， 则 会清除原(storeKey对应的)set中所有的项，然后将差集添加到(storeKey对应的)set中
          * case3: 差集为空, 则不进行下面的操作, 直接返回0
-         *
          * 注: 求并集的部分，详见{@link SetOps#sDifference(String, String)}
          *
          * @param key
@@ -2072,13 +1792,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把差集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)Set后, 该set对应的size
-         * @date 2020/3/11 14:33:36
          */
         public static long sDifferenceAndStore(String key, Collection<String> otherKeys, String storeKey) {
-            log.debug("sDifferenceAndStore(...) => key -> {}, otherKeys -> {}, storeKey -> {}",
-                    key, otherKeys, storeKey);
             Long size = redisTemplate.opsForSet().differenceAndStore(key, otherKeys, storeKey);
-            log.debug("sDifferenceAndStore(...) => size -> {}", size);
+            log.debug("sDifferenceAndStore key -> {}, otherKeys -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKeys, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2087,18 +1805,15 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取key对应的set
-         *
          * 注: 若key不存在, 则返回的是空的set(, 而不是null)
          *
          * @param key
          *            定位set的key
          * @return  (key对应的)set
-         * @date 2020/3/11 14:49:39
          */
         public static Set<String> sMembers(String key) {
-            log.debug("sMembers(...) => key -> {}", key);
             Set<String> members = redisTemplate.opsForSet().members(key);
-            log.debug("sMembers(...) => members -> {}", members);
+            log.debug("sMembers key -> {} => members -> {}", key, members);
             return members;
         }
 
@@ -2108,18 +1823,15 @@ public class RedisUtil implements ApplicationContextAware {
          * @param key
          *            定位set的key
          * @return  随机获取到的项
-         * @date 2020/3/11 14:54:58
          */
         public static String sRandomMember(String key) {
-            log.debug("sRandomMember(...) => key -> {}", key);
             String randomItem = redisTemplate.opsForSet().randomMember(key);
-            log.debug("sRandomMember(...) => randomItem -> {}", randomItem);
+            log.debug("sRandomMember key -> {} => randomItem -> {}", key, randomItem);
             return randomItem;
         }
 
         /**
          * 从key对应的set中获取count次随机项(, set中的同一个项可能被多次获取)
-         *
          * 注: count可大于set的size。
          * 注: 取出来的结果里可能存在相同的值。
          *
@@ -2129,18 +1841,15 @@ public class RedisUtil implements ApplicationContextAware {
          *            要取多少项
          *
          * @return  随机获取到的项集
-         * @date 2020/3/11 14:54:58
          */
         public static List<String> sRandomMembers(String key, long count) {
-            log.debug("sRandomMembers(...) => key -> {}, count -> {}", key, count);
             List<String> randomItems = redisTemplate.opsForSet().randomMembers(key, count);
-            log.debug("sRandomMembers(...) => randomItems -> {}", randomItems);
+            log.debug("sRandomMembers key -> {}, count -> {} => randomItems -> {}", key, count, randomItems);
             return randomItems;
         }
 
         /**
          * 从key对应的set中随机获取count个项
-         *
          * 注: 若count >= set的size, 那么返回的即为这个key对应的set。
          * 注: 取出来的结果里没有重复的项。
          *
@@ -2150,19 +1859,16 @@ public class RedisUtil implements ApplicationContextAware {
          *            要取多少项
          *
          * @return  随机获取到的项集
-         * @date 2020/3/11 14:54:58
          */
         public static Set<String> sDistinctRandomMembers(String key, long count) {
-            log.debug("sDistinctRandomMembers(...) => key -> {}, count -> {}", key, count);
             Set<String> distinctRandomItems = redisTemplate.opsForSet().distinctRandomMembers(key, count);
-            log.debug("sDistinctRandomMembers(...) => distinctRandomItems -> {}", distinctRandomItems);
+            log.debug("sDistinctRandomMembers key -> {}, count -> {} => distinctRandomItems -> {}"
+                    , key, count, distinctRandomItems);
             return distinctRandomItems;
         }
 
         /**
          * 根据options匹配到(key对应的)set中的对应的item, 并返回对应的item集
-         *
-         *
          * 注: ScanOptions实例的创建方式举例:
          *     1、ScanOptions.NONE
          *     2、ScanOptions.scanOptions().match("n??e").build()
@@ -2179,44 +1885,33 @@ public class RedisUtil implements ApplicationContextAware {
          *                此处的匹配规则与{@link KeyOps#keys(String)}处的一样。
          *
          * @return  匹配到的(key对应的)set中的项
-         * @date 2020/3/9 10:49:27
          */
         public static Cursor<String> sScan(String key, ScanOptions options) {
-            log.debug("sScan(...) => key -> {}, options -> {}", key, JSON.toJSONString(options));
             Cursor<String> cursor = redisTemplate.opsForSet().scan(key, options);
-            log.debug("sScan(...) => cursor -> {}", JSON.toJSONString(cursor));
+            log.debug("sScan key -> {}, options -> {} => cursor -> {}", key, JSON.toJSONString(options), JSON.toJSONString(cursor));
             return cursor;
         }
     }
 
     /**
      * ZSet相关操作
-     *
      * 特别说明: ZSet是有序的,
      *             不仅体现在： redis中的存储上有序。
      *             还体现在:   此工具类ZSetOps中返回值类型为Set<?>的方法, 实际返回类型是LinkedHashSet<?>
-     *
      * 提示: redis中的ZSet, 一定程度等于redis中的Set + redis中的Hash的结合体。
      * 提示: redis中String的数据结构可参考resources/data-structure/ZSet(有序集合)的数据结构(示例一).png
      *      redis中String的数据结构可参考resources/data-structure/ZSet(有序集合)的数据结构(示例二).png
      * 提示: ZSet中的entryKey即为成员项， entryValue即为这个成员项的分值, ZSet根据成员的分值，来堆成员进行排序。
-     *
-     * @author JustryDeng
-     * @date 2020/3/11 15:28:48
      */
     public static class ZSetOps {
 
         /**
          * 向(key对应的)zset中添加(item, score)
-         *
          * 注: item为entryKey成员项， score为entryValue分数值。
-         *
          * 注: 若(key对应的)zset中已存在(与此次要添加的项)相同的item项，那么此次添加操作会失败，返回false；
          *     但是！！！ zset中原item的score会被更新为此次add的相同item项的score。
          *     所以, 也可以通过zAdd达到更新item对应score的目的。
-         *
          * 注: score可为正、可为负、可为0; 总之, double范围内都可以。
-         *
          * 注: 若score的值一样，则按照item排序。
          *
          * @param key
@@ -2227,12 +1922,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            item的分值
          *
          * @return 是否添加成功
-         * @date 2020/3/11 15:35:30
          */
         public static boolean zAdd(String key, String item, double score) {
-            log.debug("zAdd(...) => key -> {}, item -> {}, score -> {}", key, item, score);
             Boolean result = redisTemplate.opsForZSet().add(key, item, score);
-            log.debug("zAdd(...) => result -> {}", result);
+            log.debug("zAdd key -> {}, item -> {}, score -> {} => result -> {}", key, item, score, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2241,7 +1934,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 批量添加entry<item, score>
-         *
          * 注: 若entry<item, score>集中存在item相同的项(, score不一样)，那么redis在执行真正的批量add操作前,会
          *     将其中一个item过滤掉。
          * 注: 同样的，若(key对应的)zset中已存在(与此次要添加的项)相同的item项，那么此次批量添加操作中，
@@ -2254,12 +1946,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要添加的entry<item, score>集
          *
          * @return 本次添加进(key对应的)zset中的entry的个数
-         * @date 2020/3/11 16:45:45
          */
         public static long zAdd(String key, Set<TypedTuple<String>> entries) {
-            log.debug("zAdd(...) => key -> {}, entries -> {}", key, JSON.toJSONString(entries));
             Long count = redisTemplate.opsForZSet().add(key, entries);
-            log.debug("zAdd(...) => count -> {}", count);
+            log.debug("zAdd key -> {}, entries -> {} => count -> {}", key, JSON.toJSONString(entries), count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2268,7 +1958,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 从(key对应的)zset中移除项
-         *
          * 注:若key不存在，则返回0
          *
          * @param key
@@ -2277,12 +1966,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            要移除的项集
          *
          * @return  实际移除了的项的个数
-         * @date 2020/3/11 17:20:12
          */
         public static long zRemove(String key, Object... items) {
-            log.debug("zRemove(...) => key -> {}, items -> {}", key, items);
             Long count = redisTemplate.opsForZSet().remove(key, items);
-            log.debug("zRemove(...) => count -> {}", count);
+            log.debug("zRemove key -> {}, items -> {} => count -> {}", key, items, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2291,19 +1978,15 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 移除(key对应的)zset中, 排名范围在[startIndex, endIndex]内的item
-         *
          * 注:默认的，按score.item升序排名， 排名从0开始
-         *
          * 注: 类似于List中的索引, 排名可以分为多个方式:
          *     从前到后(正向)的排名: 0、1、2...
          *     从后到前(反向)的排名: -1、-2、-3...
-         *
          * 注: 不论是使用正向排名，还是使用反向排名, 使用此方法时, 应保证 startRange代表的元素的位置
          *     在endRange代表的元素的位置的前面， 如:
          *      示例一: RedisUtil.ZSetOps.zRemoveRange("name", 0, 2);
          *      示例二: RedisUtil.ZSetOps.zRemoveRange("site", -2, -1);
          *      示例三: RedisUtil.ZSetOps.zRemoveRange("foo", 0, -1);
-         *
          * 注:若key不存在，则返回0
          *
          * @param key
@@ -2314,13 +1997,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            结尾项的排名
          *
          * @return  实际移除了的项的个数
-         * @date 2020/3/11 17:20:12
          */
         public static long zRemoveRange(String key, long startRange, long endRange) {
-            log.debug("zRemoveRange(...) => key -> {}, startRange -> {}, endRange -> {}",
-                    key, startRange, endRange);
             Long count = redisTemplate.opsForZSet().removeRange(key, startRange, endRange);
-            log.debug("zRemoveRange(...) => count -> {}", count);
+            log.debug("zRemoveRange key -> {}, startRange -> {}, endRange -> {} => count -> {}"
+                    , key, startRange, endRange, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2329,12 +2010,10 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 移除(key对应的)zset中, score范围在[minScore, maxScore]内的item
-         *
          * 提示: 虽然删除范围包含两侧的端点(即:包含minScore和maxScore), 但是由于double存在精度问题，所以建议:
          *          设置值时，minScore应该设置得比要删除的项里，最小的score还小一点
          *                   maxScore应该设置得比要删除的项里，最大的score还大一点
          *          追注: 本人简单测试了几组数据，暂未出现精度问题。
-         *
          * 注:若key不存在，则返回0
          *
          * @param key
@@ -2345,13 +2024,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            score上限(含这个值)
          *
          * @return  实际移除了的项的个数
-         * @date 2020/3/11 17:20:12
          */
         public static long zRemoveRangeByScore(String key, double minScore, double maxScore) {
-            log.debug("zRemoveRangeByScore(...) => key -> {}, startIndex -> {}, startIndex -> {}",
-                    key, minScore, maxScore);
             Long count = redisTemplate.opsForZSet().removeRangeByScore(key, minScore, maxScore);
-            log.debug("zRemoveRangeByScore(...) => count -> {}", count);
+            log.debug("zRemoveRangeByScore key -> {}, startIndex -> {}, startIndex -> {} => count -> {}"
+                    , key, minScore, maxScore, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2368,12 +2045,11 @@ public class RedisUtil implements ApplicationContextAware {
          * @param delta
          *            变化量(正 - 增, 负 - 减)
          * @return 修改后的score值
-         * @date 2020/3/12 8:55:38
          */
         public static double zIncrementScore(String key, String item, double delta) {
-            log.debug("zIncrementScore(...) => key -> {}, item -> {}, delta -> {}", key, item, delta);
             Double scoreValue = redisTemplate.opsForZSet().incrementScore(key, item, delta);
-            log.debug("zIncrementScore(...) => scoreValue -> {}", scoreValue);
+            log.debug("zIncrementScore key -> {}, item -> {}, delta -> {} => scoreValue -> {}"
+                    , key, item, delta, scoreValue);
             if (scoreValue == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2382,7 +2058,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 返回item在(key对应的)zset中的(按score从小到大的)排名
-         *
          * 注: 排名从0开始。 即意味着，此方法等价于: 返回item在(key对应的)zset中的位置索引。
          * 注: 若key或item不存在， 返回null。
          * 注: 排序规则是score,item, 即:优先以score排序，若score相同，则再按item排序。
@@ -2393,12 +2068,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            项
          *
          * @return 排名(等价于: 索引)
-         * @date 2020/3/12 9:14:09
          */
         public static long zRank(String key, Object item) {
-            log.debug("zRank(...) => key -> {}, item -> {}", key, item);
             Long rank = redisTemplate.opsForZSet().rank(key, item);
-            log.debug("zRank(...) => rank -> {}", rank);
+            log.debug("zRank key -> {}, item -> {} => rank -> {}", key, item, rank);
             if (rank == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2407,7 +2080,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 返回item在(key对应的)zset中的(按score从大到小的)排名
-         *
          * 注: 排名从0开始。补充: 因为是按score从大到小排序的, 所以最大score对应的item的排名为0。
          * 注: 若key或item不存在， 返回null。
          * 注: 排序规则是score,item, 即:优先以score排序，若score相同，则再按item排序。
@@ -2418,12 +2090,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            项
          *
          * @return 排名(等价于: 索引)
-         * @date 2020/3/12 9:14:09
          */
         public static long zReverseRank(String key, Object item) {
-            log.debug("zReverseRank(...) => key -> {}, item -> {}", key, item);
             Long reverseRank = redisTemplate.opsForZSet().reverseRank(key, item);
-            log.debug("zReverseRank(...) => reverseRank -> {}", reverseRank);
+            log.debug("zReverseRank key -> {}, item -> {} => reverseRank -> {}", key, item, reverseRank);
             if (reverseRank == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2432,15 +2102,12 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 根据索引位置， 获取(key对应的)zset中排名处于[start, end]中的item项集
-         *
          * 注: 不论是使用正向排名，还是使用反向排名, 使用此方法时, 应保证 startIndex代表的元素的
          *      位置在endIndex代表的元素的位置的前面， 如:
          *      示例一: RedisUtil.ZSetOps.zRange("name", 0, 2);
          *      示例二: RedisUtil.ZSetOps.zRange("site", -2, -1);
          *      示例三: RedisUtil.ZSetOps.zRange("foo", 0, -1);
-         *
          * 注: 若key不存在, 则返回空的集合。
-         *
          * 注: 当[start, end]的范围比实际zset的范围大时, 返回范围上"交集"对应的项集合。
          *
          * @param key
@@ -2451,12 +2118,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            排名结束位置
          *
          * @return  对应的item项集
-         * @date 2020/3/12 9:50:40
          */
         public static Set<String> zRange(String key, long start, long end) {
-            log.debug("zRange(...) => key -> {}, start -> {}, end -> {}", key, start, end);
             Set<String> result = redisTemplate.opsForZSet().range(key, start, end);
-            log.debug("zRange(...) => result -> {}", result);
+            log.debug("zRange key -> {}, start -> {}, end -> {}=> result -> {}", key, start, end, result);
             return result;
         }
 
@@ -2469,28 +2134,22 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位zset的键
          *
          * @return  (key对应的)zset中的所有item项
-         * @date 2020/3/12 10:02:07
          */
         public static Set<String> zWholeZSetItem(String key) {
-            log.debug("zWholeZSetItem(...) => key -> {}", key);
             Set<String> result = redisTemplate.opsForZSet().range(key, 0, -1);
-            log.debug("zWholeZSetItem(...) =>result -> {}", result);
+            log.debug("zWholeZSetItem key -> {} =>result -> {}", key, result);
             return result;
         }
 
         /**
          * 根据索引位置， 获取(key对应的)zset中排名处于[start, end]中的entry集
-         *
          * 注: 不论是使用正向排名，还是使用反向排名, 使用此方法时, 应保证 startIndex代表的元素的
          *      位置在endIndex代表的元素的位置的前面， 如:
          *      示例一: RedisUtil.ZSetOps.zRange("name", 0, 2);
          *      示例二: RedisUtil.ZSetOps.zRange("site", -2, -1);
          *      示例三: RedisUtil.ZSetOps.zRange("foo", 0, -1);
-         *
          * 注: 若key不存在, 则返回空的集合。
-         *
          * 注: 当[start, end]的范围比实际zset的范围大时, 返回范围上"交集"对应的项集合。
-         *
          * 注: 此方法和{@link ZSetOps#zRange(String, long, long)}类似，不过此方法返回的不是item集， 而是entry集
          *
          * @param key
@@ -2501,12 +2160,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            排名结束位置
          *
          * @return  对应的entry集
-         * @date 2020/3/12 9:50:40
          */
         public static Set<TypedTuple<String>> zRangeWithScores(String key, long start, long end) {
-            log.debug("zRangeWithScores(...) => key -> {}, start -> {}, end -> {}", key, start, end);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().rangeWithScores(key, start, end);
-            log.debug("zRangeWithScores(...) => entries -> {}", JSON.toJSONString(entries));
+            log.debug("zRangeWithScores key -> {}, start -> {}, end -> {} => entries -> {}"
+                    , key, start, end, JSON.toJSONString(entries));
             return entries;
         }
 
@@ -2519,21 +2177,17 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位zset的键
          *
          * @return  (key对应的)zset中的所有entry
-         * @date 2020/3/12 10:02:07
          */
         public static Set<TypedTuple<String>> zWholeZSetEntry(String key) {
-            log.debug("zWholeZSetEntry(...) => key -> {}", key);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
-            log.debug("zWholeZSetEntry(...) => entries -> {}", key, JSON.toJSONString(entries));
+            log.debug("zWholeZSetEntry key -> {} => entries -> {}", key, JSON.toJSONString(entries));
             return entries;
         }
 
         /**
          * 根据score， 获取(key对应的)zset中分数值处于[minScore, maxScore]中的item项集
-         *
          * 注: 若key不存在, 则返回空的集合。
          * 注: 当[minScore, maxScore]的范围比实际zset中score的范围大时, 返回范围上"交集"对应的项集合。
-         *
          * 提示: 虽然删除范围包含两侧的端点(即:包含minScore和maxScore), 但是由于double存在精度问题，所以建议:
          *          设置值时，minScore应该设置得比要删除的项里，最小的score还小一点
          *                   maxScore应该设置得比要删除的项里，最大的score还大一点
@@ -2547,23 +2201,19 @@ public class RedisUtil implements ApplicationContextAware {
          *            score上限
          *
          * @return  对应的item项集
-         * @date 2020/3/12 9:50:40
          */
         public static Set<String> zRangeByScore(String key, double minScore, double maxScore) {
-            log.debug("zRangeByScore(...) => key -> {}, minScore -> {}, maxScore -> {}", key, minScore, maxScore);
             Set<String> items = redisTemplate.opsForZSet().rangeByScore(key, minScore, maxScore);
-            log.debug("zRangeByScore(...) => items -> {}", items);
+            log.debug("zRangeByScore key -> {}, minScore -> {}, maxScore -> {} => items -> {}"
+                    , key, minScore, maxScore, items);
             return items;
         }
 
         /**
          * 根据score， 获取(key对应的)zset中分数值处于[minScore, maxScore]中的, score处于[minScore,
          * 排名大于等于offset的count个item项
-         *
          * 特别注意: 对于不是特别熟悉redis的人来说, offset 和 count最好都使用正数， 避免引起理解上的歧义。
-         *
          * 注: 若key不存在, 则返回空的集合。
-         *
          * 提示: 虽然删除范围包含两侧的端点(即:包含minScore和maxScore), 但是由于double存在精度问题，所以建议:
          *          设置值时，minScore应该设置得比要删除的项里，最小的score还小一点
          *                   maxScore应该设置得比要删除的项里，最大的score还大一点
@@ -2581,14 +2231,12 @@ public class RedisUtil implements ApplicationContextAware {
          *            期望获取到的元素个数
          *
          * @return  对应的item项集
-         * @date 2020/3/12 9:50:40
          */
         public static Set<String> zRangeByScore(String key, double minScore, double maxScore,
                                                 long offset, long count) {
-            log.debug("zRangeByScore(...) => key -> {}, minScore -> {}, maxScore -> {}, offset -> {}, "
-                    + "count -> {}", key, minScore, maxScore, offset, count);
             Set<String> items = redisTemplate.opsForZSet().rangeByScore(key, minScore, maxScore, offset, count);
-            log.debug("zRangeByScore(...) => items -> {}", items);
+            log.debug("zRangeByScore key -> {}, minScore -> {}, maxScore -> {}, offset -> {}, count -> {} => items -> {}"
+                    , key, minScore, maxScore, offset, count, items);
             return items;
         }
 
@@ -2608,19 +2256,16 @@ public class RedisUtil implements ApplicationContextAware {
          *            score上限
          *
          * @return  (key对应的)zset中的所有score处于[minScore, maxScore]中的entry
-         * @date 2020/3/12 10:02:07
          */
         public static Set<TypedTuple<String>> zRangeByScoreWithScores(String key, double minScore, double maxScore) {
-            log.debug("zRangeByScoreWithScores(...) => key -> {}, minScore -> {}, maxScore -> {}",
-                    key, minScore, maxScore);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().rangeByScoreWithScores(key, minScore, maxScore);
-            log.debug("zRangeByScoreWithScores(...) => entries -> {}", JSON.toJSONString(entries));
+            log.debug("zRangeByScoreWithScores key -> {}, minScore -> {}, maxScore -> {} => entries -> {}"
+                    , key, minScore, maxScore, JSON.toJSONString(entries));
             return entries;
         }
 
         /**
          * 获取(key对应的)zset中, score处于[minScore, maxScore]里的、排名大于等于offset的count个entry
-         *
          * 特别注意: 对于不是特别熟悉redis的人来说, offset 和 count最好都使用正数， 避免引起理解上的歧义。
          *
          * @param key
@@ -2635,17 +2280,14 @@ public class RedisUtil implements ApplicationContextAware {
          *            期望获取到的元素个数
          *
          * @return [startIndex, endIndex] & [minScore, maxScore]里的entry
-         * @date 2020/3/12 11:09:06
          */
         public static Set<TypedTuple<String>> zRangeByScoreWithScores(String key, double minScore,
                                                                       double maxScore, long offset,
                                                                       long count) {
-            log.debug("zRangeByScoreWithScores(...) => key -> {}, minScore -> {}, maxScore -> {},"
-                            + " offset -> {}, count -> {}",
-                    key, minScore, maxScore, offset, count);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().rangeByScoreWithScores(key, minScore,
                     maxScore, offset, count);
-            log.debug("zRangeByScoreWithScores(...) => entries -> {}", JSON.toJSONString(entries));
+            log.debug("zRangeByScoreWithScores key -> {}, minScore -> {}, maxScore -> {}, offset -> {}, count -> {} => entries -> {}"
+                    , key, minScore, maxScore, offset, count, JSON.toJSONString(entries));
             return entries;
         }
 
@@ -2656,9 +2298,8 @@ public class RedisUtil implements ApplicationContextAware {
          * @see ZSetOps#zRange(String, long, long)。 只是zReverseRange这里会提前多一个倒序。
          */
         public static Set<String> zReverseRange(String key, long start, long end) {
-            log.debug("zReverseRange(...) => key -> {}, start -> {}, end -> {}", key, start, end);
             Set<String> entries = redisTemplate.opsForZSet().reverseRange(key, start, end);
-            log.debug("zReverseRange(...) => entries -> {}", entries);
+            log.debug("zReverseRange key -> {}, start -> {}, end -> {} => entries -> {}", key, start, end, entries);
             return entries;
         }
 
@@ -2668,9 +2309,9 @@ public class RedisUtil implements ApplicationContextAware {
          * @see ZSetOps#zRangeWithScores(String, long, long)。 只是zReverseRangeWithScores这里会提前多一个倒序。
          */
         public static Set<TypedTuple<String>> zReverseRangeWithScores(String key, long start, long end) {
-            log.debug("zReverseRangeWithScores(...) => key -> {}, start -> {}, end -> {}", key, start, end);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end);
-            log.debug("zReverseRangeWithScores(...) => entries -> {}", JSON.toJSONString(entries));
+            log.debug("zReverseRangeWithScores key -> {}, start -> {}, end -> {} => entries -> {}"
+                    , key, start, end, JSON.toJSONString(entries));
             return entries;
         }
 
@@ -2680,10 +2321,9 @@ public class RedisUtil implements ApplicationContextAware {
          * @see ZSetOps#zRangeByScore(String, double, double)。 只是zReverseRangeByScore这里会提前多一个倒序。
          */
         public static Set<String> zReverseRangeByScore(String key, double minScore, double maxScore) {
-            log.debug("zReverseRangeByScore(...) => key -> {}, minScore -> {}, maxScore -> {}",
-                    key, minScore, maxScore);
             Set<String> items = redisTemplate.opsForZSet().reverseRangeByScore(key, minScore, maxScore);
-            log.debug("zReverseRangeByScore(...) => items -> {}", items);
+            log.debug("zReverseRangeByScore key -> {}, minScore -> {}, maxScore -> {} => items -> {}"
+                    , key, minScore, maxScore, items);
             return items;
         }
 
@@ -2693,11 +2333,10 @@ public class RedisUtil implements ApplicationContextAware {
          * @see ZSetOps#zRangeByScoreWithScores(String, double, double)。 只是zReverseRangeByScoreWithScores这里会提前多一个倒序。
          */
         public static Set<TypedTuple<String>> zReverseRangeByScoreWithScores(String key, double minScore, double maxScore) {
-            log.debug("zReverseRangeByScoreWithScores(...) => key -> {}, minScore -> {}, maxScore -> {}",
-                    key, minScore, maxScore);
             Set<TypedTuple<String>> entries = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key,
                     minScore, maxScore);
-            log.debug("zReverseRangeByScoreWithScores(...) => entries -> {}", JSON.toJSONString(entries));
+            log.debug("zReverseRangeByScoreWithScores key -> {}, minScore -> {}, maxScore -> {} => entries -> {}"
+                    , key, minScore, maxScore, JSON.toJSONString(entries));
             return entries;
         }
 
@@ -2708,10 +2347,9 @@ public class RedisUtil implements ApplicationContextAware {
          * @see ZSetOps#zRangeByScore(String, double, double, long, long)。 只是zReverseRangeByScore这里会提前多一个倒序。
          */
         public static Set<String> zReverseRangeByScore(String key, double minScore, double maxScore, long offset, long count) {
-            log.debug("zReverseRangeByScore(...) => key -> {}, minScore -> {}, maxScore -> {}, offset -> {}, "
-                    + "count -> {}", key, minScore, maxScore, offset, count);
             Set<String> items = redisTemplate.opsForZSet().reverseRangeByScore(key, minScore, maxScore, offset, count);
-            log.debug("items -> {}", items);
+            log.debug("zReverseRangeByScore => key -> {}, minScore -> {}, maxScore -> {}, offset -> {}, count -> {} => items -> {}"
+                    , key, minScore, maxScore, offset, count, items);
             return items;
         }
 
@@ -2726,12 +2364,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            score上限
          *
          * @return  [minScore, maxScore]中item的个数
-         * @date 2020/3/13 12:20:43
          */
         public static long zCount(String key, double minScore, double maxScore) {
-            log.debug("zCount(...) => key -> {}, minScore -> {}, maxScore -> {}",key, minScore, maxScore);
             Long count = redisTemplate.opsForZSet().count(key, minScore, maxScore);
-            log.debug("zCount(...) => count -> {}", count);
+            log.debug("zCount key -> {}, minScore -> {}, maxScore -> {} => count -> {}",key, minScore, maxScore, count);
             if (count == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2740,19 +2376,16 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 统计(key对应的)zset中item的个数
-         *
          * 注: 此方法等价于{@link ZSetOps#zZCard(String)}
          *
          * @param key
          *            定位zset的key
          *
          * @return  zset中item的个数
-         * @date 2020/3/13 12:20:43
          */
         public static long zSize(String key) {
-            log.debug("zSize(...) => key -> {}", key);
             Long size = redisTemplate.opsForZSet().size(key);
-            log.debug("zSize(...) => size -> {}", size);
+            log.debug("zSize key -> {} => size -> {}", key, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2761,19 +2394,16 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 统计(key对应的)zset中item的个数
-         *
          * 注: 此方法等价于{@link ZSetOps#zSize(String)}
          *
          * @param key
          *            定位zset的key
          *
          * @return  zset中item的个数
-         * @date 2020/3/13 12:20:43
          */
         public static long zZCard(String key) {
-            log.debug("zZCard(...) => key -> {}", key);
             Long size = redisTemplate.opsForZSet().zCard(key);
-            log.debug("zZCard(...) => size -> {}", size);
+            log.debug("zZCard key -> {} => size -> {}", key, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2789,12 +2419,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            zset中的item
          *
          * @return  item的score
-         * @date 2020/3/13 14:51:43
          */
         public static double zScore(String key, Object item) {
-            log.debug("zScore(...) => key -> {}, item -> {}", key, item);
             Double score = redisTemplate.opsForZSet().score(key, item);
-            log.debug("zScore(...) => score -> {}", score);
+            log.debug("zScore key -> {}, item -> {} => score -> {}", key, item, score);
             if (score == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2803,11 +2431,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)ZSet的并集, 并将结果add到storeKey对应的ZSet中。
-         *
          * 注: 和set一样，zset中item是唯一的， 在多个zset进行Union时, 处理相同的item时， score的值会变为对应的score之和，如：
          *         RedisUtil.ZSetOps.zAdd("name1", "a", 1);和RedisUtil.ZSetOps.zAdd("name2", "a", 2);
          *         对(name1和name2对应的)zset进行zUnionAndStore之后，新的zset中的项a,对应的score值为3
-         *
          * case1: 交集不为空, storeKey不存在， 则 会创建对应的storeKey，并将并集添加到(storeKey对应的)ZSet中
          * case2: 交集不为空, storeKey已存在， 则 会清除原(storeKey对应的)ZSet中所有的项，然后将并集添加到(storeKey对应的)ZSet中
          * case3: 交集为空, 则不进行下面的操作, 直接返回0
@@ -2820,12 +2446,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把交集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)ZSet后, 该ZSet对应的size
-         * @date 2020/3/11 12:26:24
          */
         public static long zUnionAndStore(String key, String otherKey, String storeKey) {
-            log.debug("zUnionAndStore(...) => key -> {}, otherKey -> {}, storeKey -> {}", key, otherKey, storeKey);
             Long size = redisTemplate.opsForZSet().unionAndStore(key, otherKey, storeKey);
-            log.debug("zUnionAndStore(...) => size -> {}", size);
+            log.debug("zUnionAndStore key -> {}, otherKey -> {}, storeKey -> {} => size -> {}", key, otherKey, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2834,11 +2458,9 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)ZSet的并集, 并将结果add到storeKey对应的ZSet中。
-         *
          * 注: 和set一样，zset中item是唯一的， 在多个zset进行Union时, 处理相同的item时， score的值会变为对应的score之和，如：
          *         RedisUtil.ZSetOps.zAdd("name1", "a", 1);和RedisUtil.ZSetOps.zAdd("name2", "a", 2);
          *         对(name1和name2对应的)zset进行zUnionAndStore之后，新的zset中的项a,对应的score值为3
-         *
          * case1: 并集不为空, storeKey不存在， 则 会创建对应的storeKey，并将并集添加到(storeKey对应的)ZSet中
          * case2: 并集不为空, storeKey已存在， 则 会清除原(storeKey对应的)ZSet中所有的项，然后将并集添加到(storeKey对应的)ZSet中
          * case3: 并集为空, 则不进行下面的操作, 直接返回0
@@ -2851,12 +2473,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把并集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)ZSet后, 该ZSet对应的size
-         * @date 2020/3/11 12:26:24
          */
         public static long zUnionAndStore(String key, Collection<String> otherKeys, String storeKey) {
-            log.debug("zUnionAndStore(...) => key -> {}, otherKeys -> {}, storeKey -> {}", key, otherKeys, storeKey);
             Long size = redisTemplate.opsForZSet().unionAndStore(key, otherKeys, storeKey);
-            log.debug("zUnionAndStore(...) => size -> {}", size);
+            log.debug("zUnionAndStore key -> {}, otherKeys -> {}, storeKey -> {} => size -> {}", key, otherKeys, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2865,7 +2485,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取两个(key对应的)ZSet的交集, 并将结果add到storeKey对应的ZSet中。
-         *
          * 注: 和set一样，zset中item是唯一的， 在多个zset进行Intersect时, 处理相同的item时， score的值会变为对应的score之和，如：
          *         RedisUtil.ZSetOps.zAdd("name1", "a", 1);
          *         RedisUtil.ZSetOps.zAdd("name1", "b", 100);
@@ -2873,7 +2492,6 @@ public class RedisUtil implements ApplicationContextAware {
          *         edisUtil.ZSetOps.zAdd("name2", "a", 2);
          *         edisUtil.ZSetOps.zAdd("name2", "c", 200);
          *         对(name1和name2对应的)zset进行zIntersectAndStore之后，新的zset中的项a,对应的score值为3
-         *
          * case1: 交集不为空, storeKey不存在， 则 会创建对应的storeKey，并将交集添加到(storeKey对应的)ZSet中
          * case2: 交集不为空, storeKey已存在， 则 会清除原(storeKey对应的)ZSet中所有的项，然后将交集添加到(storeKey对应的)ZSet中
          * case3: 交集为空, 则不进行下面的操作, 直接返回0
@@ -2886,12 +2504,10 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把交集添加到哪个)ZSet的key
          *
          * @return  add到(storeKey对应的)ZSet后, 该ZSet对应的size
-         * @date 2020/3/11 9:46:46
          */
         public static long zIntersectAndStore(String key, String otherKey, String storeKey) {
-            log.debug("zIntersectAndStore(...) => key -> {}, otherKey -> {}, storeKey -> {}", key, otherKey, storeKey);
             Long size = redisTemplate.opsForZSet().intersectAndStore(key, otherKey, storeKey);
-            log.debug("zIntersectAndStore(...) => size -> {}", size);
+            log.debug("zIntersectAndStore key -> {}, otherKey -> {}, storeKey -> {} => size -> {}", key, otherKey, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2900,7 +2516,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取多个(key对应的)ZSet的交集, 并将结果add到storeKey对应的ZSet中。
-         *
          * case1: 交集不为空, storeKey不存在， 则 会创建对应的storeKey，并将交集添加到(storeKey对应的)ZSet中
          * case2: 交集不为空, storeKey已存在， 则 会清除原(storeKey对应的)ZSet中所有的项，然后将交集添加到(storeKey对应的)ZSet中
          * case3: 交集为空, 则不进行下面的操作, 直接返回0
@@ -2913,13 +2528,11 @@ public class RedisUtil implements ApplicationContextAware {
          *            定位(要把并集添加到哪个)set的key
          *
          * @return  add到(storeKey对应的)ZSet后, 该ZSet对应的size
-         * @date 2020/3/11 11:04:29
          */
         public static long zIntersectAndStore(String key, Collection<String> otherKeys, String storeKey) {
-            log.debug("zIntersectAndStore(...) => key -> {}, otherKeys -> {}, storeKey -> {}",
-                    key, otherKeys, storeKey);
             Long size = redisTemplate.opsForZSet().intersectAndStore(key, otherKeys, storeKey);
-            log.debug("zIntersectAndStore(...) => size -> {}", size);
+            log.debug("zIntersectAndStore key -> {}, otherKeys -> {}, storeKey -> {} => size -> {}"
+                    , key, otherKeys, storeKey, size);
             if (size == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -2929,7 +2542,6 @@ public class RedisUtil implements ApplicationContextAware {
 
     /**
      * redis分布式锁.
-     *
      * 使用方式(示例):
      *          boolean flag = false;
      *          String lockName = "sichuan:mianyang:fucheng:ds";
@@ -2950,9 +2562,6 @@ public class RedisUtil implements ApplicationContextAware {
      *                  RedisUtil.LockOps.releaseLock(lockName, lockValue);
      *              }
      *          }
-     *
-     * @author JustryDeng
-     * @date 2020/3/14 19:23:26
      */
     public static class LockOps {
 
@@ -2977,7 +2586,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取(分布式)锁.
-         *
          * 注: 获取结果是即时返回的、是非阻塞的。
          *
          * @see RedisUtil.LockOps#getLock(String, String, long, TimeUnit)
@@ -2990,7 +2598,6 @@ public class RedisUtil implements ApplicationContextAware {
          * 获取(分布式)锁。
          * 若成功, 则直接返回;
          * 若失败, 则进行重试, 直到成功 或 超时为止。
-         *
          * 注: 获取结果是阻塞的， 要么成功, 要么超时, 才返回。
          *
          * @param retryTimeoutLimit
@@ -3009,7 +2616,6 @@ public class RedisUtil implements ApplicationContextAware {
          * 获取(分布式)锁。
          * 若成功, 则直接返回;
          * 若失败, 则进行重试, 直到成功 或 超时为止。
-         *
          * 注: 获取结果是阻塞的， 要么成功, 要么超时, 才返回。
          *
          * @param retryTimeoutLimit
@@ -3022,7 +2628,7 @@ public class RedisUtil implements ApplicationContextAware {
         public static boolean getLockUntilTimeout(final String key, final String value,
                                                   final long timeout, final TimeUnit unit,
                                                   final long retryTimeoutLimit) {
-            log.debug("getLockUntilTimeout(...) => key -> {}, value -> {}, timeout -> {}, unit -> {}, "
+            log.debug("getLockUntilTimeout => key -> {}, value -> {}, timeout -> {}, unit -> {}, "
                     + "retryTimeoutLimit -> {}ms", key, value, timeout, unit, retryTimeoutLimit);
             long startTime = Instant.now().toEpochMilli();
             long now = startTime;
@@ -3030,22 +2636,21 @@ public class RedisUtil implements ApplicationContextAware {
                 try {
                     boolean alreadyGotLock = getLock(key, value, timeout, unit, false);
                     if (alreadyGotLock) {
-                        log.debug("getLockUntilTimeout(...) => consume time -> {}ms, result -> true", now - startTime);
+                        log.debug("getLockUntilTimeout => consume time -> {}ms, result -> true", now - startTime);
                         return true;
                     }
                 } catch (Exception e) {
-                    log.warn("getLockUntilTimeout(...) => try to get lock failure! e.getMessage -> {}",
+                    log.error("getLockUntilTimeout => try to get lock failure! e.getMessage -> {}",
                             e.getMessage());
                 }
                 now = Instant.now().toEpochMilli();
             } while (now < startTime + retryTimeoutLimit);
-            log.debug("getLockUntilTimeout(...) => consume time -> {}ms, result -> false", now - startTime);
+            log.debug("getLockUntilTimeout => consume time -> {}ms, result -> false", now - startTime);
             return false;
         }
 
         /**
          * 获取(分布式)锁
-         *
          * 注: 获取结果是即时返回的、是非阻塞的。
          *
          * @see RedisUtil.LockOps#getLock(String, String, long, TimeUnit, boolean)
@@ -3057,7 +2662,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 获取(分布式)锁
-         *
          * 注: 获取结果是即时返回的、是非阻塞的。
          *
          * @param key
@@ -3083,10 +2687,6 @@ public class RedisUtil implements ApplicationContextAware {
         public static boolean getLock(final String key, final String value,
                                       final long timeout, final TimeUnit unit,
                                       boolean recordLog) {
-            if (recordLog) {
-                log.debug("getLock(...) => key -> {}, value -> {}, timeout -> {}, unit -> {}, recordLog -> {}",
-                        key, value, timeout, unit, recordLog);
-            }
             Boolean result = redisTemplate.execute((RedisConnection connection) ->
                     connection.set(key.getBytes(StandardCharsets.UTF_8),
                             value.getBytes(StandardCharsets.UTF_8),
@@ -3094,7 +2694,8 @@ public class RedisUtil implements ApplicationContextAware {
                             RedisStringCommands.SetOption.SET_IF_ABSENT)
             );
             if (recordLog) {
-                log.debug("getLock(...) => result -> {}", result);
+                log.debug("getLock  key -> {}, value -> {}, timeout -> {}, unit -> {} => result -> {}"
+                        ,key, value, timeout, unit, result);
             }
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
@@ -3104,7 +2705,6 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 释放(分布式)锁
-         *
          * 注: 此方式能(通过value的唯一性)保证: 自己加的锁, 只能被自己释放。
          * 注: 锁超时时, 也会被redis自动删除释放。
          *
@@ -3114,16 +2714,14 @@ public class RedisUtil implements ApplicationContextAware {
          *            锁名对应的value
          *
          * @return 释放锁是否成功
-         * @date 2020/3/15 17:00:45
          */
         public static boolean releaseLock(final String key, final String value) {
-            log.debug("releaseLock(...) => key -> {}, lockValue -> {}", key, value);
             Boolean result = redisTemplate.execute((RedisConnection connection) ->
                     connection.eval(RELEASE_LOCK_LUA.getBytes(),
                             ReturnType.BOOLEAN ,1,
                             key.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8))
             );
-            log.debug("releaseLock(...) => result -> {}", result);
+            log.debug("releaseLock key -> {}, lockValue -> {} => result -> {}", key, value, result);
             if (result == null) {
                 throw new RedisOpsResultIsNullException();
             }
@@ -3132,13 +2730,11 @@ public class RedisUtil implements ApplicationContextAware {
 
         /**
          * 释放锁, 不校验该key对应的value值
-         *
          * 注: 此方式释放锁，可能导致: 自己加的锁, 结果被别人释放了。
          *     所以不建议使用此方式释放锁。
          *
          * @param key
          *            锁名
-         * @date 2020/3/15 18:56:59
          */
         @Deprecated
         public static void releaseLock(final String key) {
@@ -3149,17 +2745,12 @@ public class RedisUtil implements ApplicationContextAware {
     /**
      * 当使用Pipeline 或 Transaction操作redis时, (不论redis中实际操作是否成功, 这里)结果(都)会返回null。
      * 此时，如果试着将null转换为基本类型的数据时，会抛出此异常。
-     *
      * 即: 此工具类中的某些方法, 希望不要使用Pipeline或Transaction操作redis。
-     *
      * 注: Pipeline 或 Transaction默认是不启用的， 可详见源码:
      *     @see LettuceConnection#isPipelined()
      *     @see LettuceConnection#isQueueing()
      *     @see JedisConnection#isPipelined()
      *     @see JedisConnection#isQueueing()
-     *
-     * @author JustryDeng
-     * @date 2020/3/14 21:22:39
      */
     public static class RedisOpsResultIsNullException extends NullPointerException {
 
@@ -3174,9 +2765,6 @@ public class RedisUtil implements ApplicationContextAware {
 
     /**
      * 提供一些基础功能支持
-     *
-     * @author JustryDeng
-     * @date 2020/3/16 0:48:14
      */
     public static class Helper {
 
@@ -3201,7 +2789,6 @@ public class RedisUtil implements ApplicationContextAware {
          *            要拼接的元素数组, 如: 【a b c】
          *
          * @return  拼接后的字符串, 如  【a:b:c】
-         * @date 2019/9/8 16:11
          */
         public static String joinBySymbol(String symbol, String... args) {
             if (symbol == null || symbol.trim().length() == 0) {
@@ -3217,6 +2804,5 @@ public class RedisUtil implements ApplicationContextAware {
             sb.replace(sb.length() - symbol.length(), sb.length(), "");
             return sb.toString();
         }
-
     }
 }

@@ -6,6 +6,7 @@ package com.timeworx.storage.redis;
  * @Date 2023/3/1 9:28 PM
  */
 public class RedisKeys {
+
     /**
      * 用户登陆信息
      * key：timeworx:login:token:{token}
@@ -14,4 +15,14 @@ public class RedisKeys {
      * ttl：{1h}
      */
     public static final String KEY_TIMEWORX_LOGIN_TOKEN = "timeworx:login:token:%s";
+
+    /**
+     * 验证码生成信息
+     * key：timeworx:login:pin:{email}
+     * type：string
+     * value：{code}
+     * ttl：{60s}
+     */
+    public static final String KEY_TIMEWORX_LOGIN_PIN = "timeworx:login:pin:%s";
+
 }

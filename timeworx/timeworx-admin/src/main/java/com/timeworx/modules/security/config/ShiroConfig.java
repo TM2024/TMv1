@@ -66,6 +66,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/", "anon");
         // 登陆页面不拦截
         filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/login/*", "anon");
         // 除上以外所有url都必须认证通过才可以访问，未通过认证自动访问LoginUrl
         filterChainDefinitionMap.put("/**", "oauth2");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

@@ -1,17 +1,23 @@
 package com.timeworx.modules.security.service;
 
 
+import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
+import com.timeworx.modules.security.contoller.LoginController;
 import com.timeworx.modules.security.oauth2.TokenGenerator;
+import com.timeworx.modules.security.proxy.EmailProxy;
 import com.timeworx.storage.mapper.user.UserMapper;
 import com.timeworx.storage.redis.RedisKeys;
 import com.timeworx.storage.redis.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -23,11 +29,16 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ShiroService {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
     @Resource
     private UserMapper userMapper;
 
-    public User findUserByName(String username) {
-        User user = userMapper.findUserByName(username);
+    @Resource
+    private EmailProxy emailProxy;
+
+    public User findUserByEmail(String email) {
+        User user = userMapper.findUserByEmail(email);
         return user;
     }
 
@@ -53,6 +64,46 @@ public class ShiroService {
     public String getUserByToken(String token) {
         String userId = RedisUtil.StringOps.get(String.format(RedisKeys.KEY_TIMEWORX_LOGIN_TOKEN, token));
         return userId;
+    }
+
+    /**
+     * send Email
+     * @param email
+     */
+    public Response sendVerifyCode(String email){
+
+        // 验证码是否已生成
+        String code = generateRandomNumber();
+
+        // 验证邮箱是否已发送过验证码
+        boolean result = RedisUtil.StringOps.setIfAbsent(String.format(RedisKeys.KEY_TIMEWORX_LOGIN_PIN, email), code, 60, TimeUnit.SECONDS);
+
+        if(!result){
+            // 验证码已生成
+            return new Response(ReturnCode.DATA_EXIST, "verify code has send");
+        }
+
+        // 验证邮箱是否注册
+        User user = userMapper.findUserByEmail(email);
+
+        if(user != null){
+            // 邮箱已注册
+            return new Response(ReturnCode.DATA_EXIST, "email has register");
+        }
+
+        // 发送验证码
+        Response response = emailProxy.sendVerifyCode(email, code);
+
+        return response;
+    }
+
+    /**
+     * 生成6位随机验证码
+     * @return
+     */
+    public String generateRandomNumber() {
+        Random random = new Random();
+        return String.valueOf(random.nextInt(900000) + 100000);
     }
 
     public Set<String> getUserPermissions(String username) {

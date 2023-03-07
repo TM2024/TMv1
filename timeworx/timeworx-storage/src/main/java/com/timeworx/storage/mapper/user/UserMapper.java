@@ -1,6 +1,7 @@
 package com.timeworx.storage.mapper.user;
 
 import com.timeworx.common.entity.user.User;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -16,4 +17,7 @@ public interface UserMapper {
 
     @Select("select `Id`, `Name`, `Password`, `Email`, `PhoneNo`, `Type`, `Status`, `Introduction`, `Avatar` from User where Email = #{email} ")
     User findUserByEmail(@Param("email") String email);
+
+    @Insert("insert into User (Id, Name, Password, Email) values (#{id}, #{name}, #{password}, #{email})")
+    Integer insertUser(User register);
 }

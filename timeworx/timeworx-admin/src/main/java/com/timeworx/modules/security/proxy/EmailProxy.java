@@ -25,7 +25,7 @@ public class EmailProxy{
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username:}")
+    @Value("${spring.mail.from:}")
     private String userEmail;
 
     public Response sendVerifyCode(String toMail, String code) {

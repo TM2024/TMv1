@@ -1,10 +1,11 @@
 package com.timeworx.modules.security.service;
 
-
 import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
+import com.timeworx.common.utils.UniqueIDUtil;
 import com.timeworx.modules.security.contoller.LoginController;
+import com.timeworx.modules.security.dto.RegisterDto;
 import com.timeworx.modules.security.oauth2.TokenGenerator;
 import com.timeworx.modules.security.proxy.EmailProxy;
 import com.timeworx.storage.mapper.user.UserMapper;
@@ -104,6 +105,48 @@ public class ShiroService {
     public String generateRandomNumber() {
         Random random = new Random();
         return String.valueOf(random.nextInt(900000) + 100000);
+    }
+
+    /**
+     * user register
+     * @param registerDto
+     * @return
+     */
+    public Response register(RegisterDto registerDto) {
+        // 获取验证码
+        String verifyCode = RedisUtil.StringOps.get(String.format(RedisKeys.KEY_TIMEWORX_LOGIN_PIN, registerDto.getEmail()));
+
+        if(StringUtils.isBlank(verifyCode)){
+            // 验证码已过期
+            return new Response(ReturnCode.DATA_NOT_EXIST, "code has expire");
+
+        }else if(!verifyCode.equals(registerDto.getPin())){
+            // 验证码不正确
+            return new Response(ReturnCode.DATA_ERROR, "pin incorrect");
+        }
+
+        // 验证邮箱是否已注册
+        // 验证邮箱是否注册
+        User user = userMapper.findUserByEmail(registerDto.getEmail());
+
+        if(user != null){
+            // 邮箱已注册
+            return new Response(ReturnCode.DATA_EXIST, "email has register");
+        }
+
+        // 用户注册
+        User register = new User();
+        Long id = UniqueIDUtil.generateId();
+        register.setId(id);
+        // 随机生成用户名
+        register.setName("user" + id );
+        register.setEmail(registerDto.getEmail());
+        // TODO 用户密码需要加密
+        register.setPassword(registerDto.getPassword());
+
+        userMapper.insertUser(register);
+        return new Response(ReturnCode.SUCCESS, "success");
+
     }
 
     public Set<String> getUserPermissions(String username) {

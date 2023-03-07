@@ -28,17 +28,34 @@ public class ReturnCode implements Serializable {
     public static final String SUCCESS = "0000";
 
     /**
+     * 10：权限错误
+     * 1000: 权限异常
+     */
+    public static final String SHIRO_ERROR = "1000";
+
+    /**
      * 20：参数格式
      * 2000: 参数错误
      */
     public static final String PARAM_ERROR = "2000";
 
     /**
+     * 30：查无数据
+     * 3000: 数据不存在
+     */
+    public static final String DATA_NOT_EXIST = "3000";
+
+    /**
+     * 40：数据关系错误
+     * 4000: 数据关系错误
+     */
+    public static final String DATA_ERROR = "4000";
+
+    /**
      * 50：数据冲突
      * 5000: 数据已存在
      */
     public static final String DATA_EXIST = "5000";
-
 
     /**
      * 9999：异常

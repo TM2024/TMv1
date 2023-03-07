@@ -1,7 +1,7 @@
 server:
   port: 8082
   servlet:
-    context-path: /
+    context-path: /timeworx
 
 # db
 jdbc:
@@ -54,6 +54,7 @@ spring.redis.port: 6379
 
 
 # 邮箱配置
-spring.mail.host: smtp.qq.com
-spring.mail.username: 631684749@qq.com
-spring.mail.password: ijipkjlzpbvpbgah
+spring.mail.host: smtp.126.com
+spring.mail.username: rongyuezhang_us@126.com
+spring.mail.password: GEFQEFWBNUYHNDRM
+spring.mail.from: rongyuezhang_us@126.com

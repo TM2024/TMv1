@@ -1,7 +1,8 @@
-package com.timeworx.modules.security.contoller;
+package com.timeworx.modules.common.controller;
 
 import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
+import com.timeworx.modules.common.exception.IpRateLimitException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
 /**
- * @Description
+ * @Description 全局异常处理
  * @Author: ryzhang
  * @Date 2023/2/3 11:01 PM
  */
@@ -31,7 +32,7 @@ public class ExceptionController {
      */
     @ExceptionHandler(value = AuthorizationException.class)
     public Response handleAuthorizationException() {
-        return new Response(ReturnCode.SHIRO_ERROR, "您当前没有权限访问~ 请联系管理员");
+        return new Response(ReturnCode.PERMISSION_DENIED, "您当前没有权限访问~ 请联系管理员");
     }
 
     /**
@@ -56,6 +57,17 @@ public class ExceptionController {
         String messages = e.getBindingResult().getAllErrors().stream()
                 .findFirst().get().getDefaultMessage();
         return new Response(ReturnCode.PARAM_ERROR, messages);
+    }
+
+
+    /**
+     * IP限流异常处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = IpRateLimitException.class)
+    public Response handler(IpRateLimitException e){
+        return new Response(ReturnCode.PERMISSION_FREQUENT, e.getMessage());
     }
 
 

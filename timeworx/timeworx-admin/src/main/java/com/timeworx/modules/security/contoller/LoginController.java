@@ -3,7 +3,8 @@ package com.timeworx.modules.security.contoller;
 import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
-import com.timeworx.modules.common.aspect.LoginAnnotation;
+import com.timeworx.modules.common.aspect.IpRateLimitAnnotation;
+import com.timeworx.modules.common.aspect.LogRecordAnnotation;
 import com.timeworx.modules.security.dto.LoginDto;
 import com.timeworx.modules.security.dto.RegisterDto;
 import com.timeworx.modules.security.service.ShiroService;
@@ -38,7 +39,9 @@ public class LoginController {
      */
     @PostMapping("/login")
     @ResponseBody
-    @LoginAnnotation
+    @LogRecordAnnotation
+    // ip地址限流
+    @IpRateLimitAnnotation
     public Response<String> login(@Valid @RequestBody LoginDto loginDto) {
         // 查询用户信息
         User user = shiroService.findUserByEmail(loginDto.getEmail());
@@ -60,7 +63,7 @@ public class LoginController {
      */
     @GetMapping("/login/code")
     @ResponseBody
-    @LoginAnnotation
+    @LogRecordAnnotation
     public Response code(@NotBlank(message = "email empty") @Email(message = "email incorrect") String email){
         // send code
         Response response = shiroService.sendVerifyCode(email);
@@ -75,7 +78,7 @@ public class LoginController {
      */
     @PostMapping("/login/register")
     @ResponseBody
-    @LoginAnnotation
+    @LogRecordAnnotation
     public Response register(@Valid @RequestBody RegisterDto registerDto){
         // register
         Response response = shiroService.register(registerDto);

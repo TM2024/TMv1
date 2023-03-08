@@ -14,9 +14,9 @@ import java.io.Serializable;
  * • 50：数据冲突
  * • 80：其他失败（非catch类异常）
  * • 99：异常
- * 3. 后两位：具体的返回内容
+ * 2. 后两位：具体的返回内容
  * • 01~99
- * 4. 特殊返回码：
+ * 3. 特殊返回码：
  * • 0000：成功
  * • 9999：系统异常
  */
@@ -29,9 +29,12 @@ public class ReturnCode implements Serializable {
 
     /**
      * 10：权限错误
-     * 1000: 权限异常
+     * 1000: 无权访问
+     * 1001: 访问频繁
      */
-    public static final String SHIRO_ERROR = "1000";
+    public static final String PERMISSION_DENIED = "1000";
+
+    public static final String PERMISSION_FREQUENT = "1001";
 
     /**
      * 20：参数格式

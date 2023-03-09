@@ -25,4 +25,13 @@ public class RedisKeys {
      */
     public static final String KEY_TIMEWORX_LOGIN_PIN = "timeworx:login:pin:%s";
 
+    /**
+     * ip地址限流
+     * key：ip:{ip}:{methodName}
+     * type：string
+     * value：{count}
+     * ttl：{配置}
+     */
+    public static final String KEY_IP_METHOD = "ip:%s:%s";
+
 }

@@ -43,6 +43,8 @@ public class Event implements Serializable {
 
     private Integer eventStatus;
 
+    private Date createTime;
+
     public class EventStatus{
         /**
          * 活动未开始

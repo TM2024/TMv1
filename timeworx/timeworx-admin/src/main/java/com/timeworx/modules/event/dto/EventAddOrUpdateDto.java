@@ -12,7 +12,7 @@ import java.util.Date;
  * @Date 2023/3/8 8:17 PM
  */
 @Data
-public class AddOrUpdateDto {
+public class EventAddOrUpdateDto {
 
     private Long eventId;
 
@@ -27,12 +27,12 @@ public class AddOrUpdateDto {
     private String photoUrl = "";
 
     @NotNull(message = "startTime empty")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @Future(message = "startTime has past")
     private Date startTime;
 
     @NotNull(message = "endTime empty")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @Future(message = "endTime has past")
     private Date endTime;
 

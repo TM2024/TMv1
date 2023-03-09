@@ -2,6 +2,7 @@ package com.timeworx.modules.common.aspect;
 
 import com.timeworx.common.utils.JsonUtil;
 import com.timeworx.modules.common.exception.IpRateLimitException;
+import com.timeworx.storage.redis.RedisKeys;
 import com.timeworx.storage.redis.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -66,7 +67,7 @@ public class MvcMethodLogAdvice {
         String ip = request.getRemoteAddr();
 
         // 限流
-        String key = "ip:" + ip + ":" + method.getName();
+        String key = String.format(RedisKeys.KEY_IP_METHOD, ip, method.getName());
         Long count = RedisUtil.StringOps.incrBy(key, 1);
         if (count == 1) {
             // 设置过期时间

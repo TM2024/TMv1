@@ -32,6 +32,15 @@ public class RedisKeys {
      * value：{count}
      * ttl：{配置}
      */
-    public static final String KEY_IP_METHOD = "ip:%s:%s";
+    public static final String KEY_TIMEWORX_IP_METHOD = "timeworx:ip:%s:%s";
 
+
+    /**
+     * 用户参加活动限制
+     * key：timeworx:event:limit:{eventId}
+     * type：string
+     * value：1
+     * ttl：1m
+     */
+    public static final String KEY_TIMEWORX_EVENT_LIMIT = "timeworx:event:limit:%s";
 }

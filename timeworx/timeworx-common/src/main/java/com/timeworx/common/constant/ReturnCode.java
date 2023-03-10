@@ -9,10 +9,8 @@ import java.io.Serializable;
  * • 00：成功
  * • 10：权限错误
  * • 20：参数格式
- * • 30：查无数据
- * • 40：数据关系错误
- * • 50：数据冲突
- * • 80：其他失败（非catch类异常）
+ * • 30：用户模块
+ * • 40：活动模块
  * • 99：异常
  * 2. 后两位：具体的返回内容
  * • 01~99
@@ -31,10 +29,17 @@ public class ReturnCode implements Serializable {
      * 10：权限错误
      * 1000: 无权访问
      * 1001: 访问频繁
+     * 1002: 验证码过期
+     * 1003: 验证码错误
+     * 1004: 验证码已发送
+     * 1005: 邮箱已注册
      */
     public static final String PERMISSION_DENIED = "1000";
-
     public static final String PERMISSION_FREQUENT = "1001";
+    public static final String CODE_EXPIRE = "1002";
+    public static final String CODE_ERROR = "1003";
+    public static final String CODE_SENT = "1004";
+    public static final String EMAIL_REGISTER = "1005";
 
     /**
      * 20：参数格式
@@ -43,22 +48,30 @@ public class ReturnCode implements Serializable {
     public static final String PARAM_ERROR = "2000";
 
     /**
-     * 30：查无数据
-     * 3000: 数据不存在
+     * 30：用户模块
      */
-    public static final String DATA_NOT_EXIST = "3000";
+
 
     /**
-     * 40：数据关系错误
-     * 4000: 数据关系错误
+     * 40：活动模块
+     * 4000: 活动无法修改
+     * 4001: 活动价格无法修改
+     * 4002: 活动人数无法修改
+     * 4003: 活动时间无法修改
+     * 4004: 活动参加限制
+     * 4005：活动参加失败
+     * 4006: 活动已参加
+     * 4007: 活动退出失败
      */
-    public static final String DATA_ERROR = "4000";
+    public static final String EVENT_MODIFY_DENIED = "4000";
+    public static final String EVENT_PRICE_MODIFY_DENIED  = "4001";
+    public static final String EVENT_NUMBER_MODIFY_DENIED  = "4002";
+    public static final String EVENT_TIME_MODIFY_DENIED  = "4003";
+    public static final String EVENT_JOIN_LIMIT = "4004";
+    public static final String EVENT_JOIN_FAILED = "4005";
+    public static final String EVENT_HAS_JOIN = "4006";
+    public static final String EVENT_EXIT_FAILED= "4007";
 
-    /**
-     * 50：数据冲突
-     * 5000: 数据已存在
-     */
-    public static final String DATA_EXIST = "5000";
 
     /**
      * 9999：异常

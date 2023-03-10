@@ -81,7 +81,7 @@ public class ShiroService {
 
         if(!result){
             // 验证码已生成
-            return new Response(ReturnCode.DATA_EXIST, "verify code has send");
+            return new Response(ReturnCode.CODE_SENT, "verify code has send");
         }
 
         // 验证邮箱是否注册
@@ -89,7 +89,7 @@ public class ShiroService {
 
         if(user != null){
             // 邮箱已注册
-            return new Response(ReturnCode.DATA_EXIST, "email has register");
+            return new Response(ReturnCode.EMAIL_REGISTER, "email has register");
         }
 
         // 发送验证码
@@ -118,11 +118,11 @@ public class ShiroService {
 
         if(StringUtils.isBlank(verifyCode)){
             // 验证码已过期
-            return new Response(ReturnCode.DATA_NOT_EXIST, "code has expire");
+            return new Response(ReturnCode.CODE_EXPIRE, "code has expire");
 
         }else if(!verifyCode.equals(registerDto.getPin())){
             // 验证码不正确
-            return new Response(ReturnCode.DATA_ERROR, "pin incorrect");
+            return new Response(ReturnCode.CODE_ERROR, "pin incorrect");
         }
 
         // 验证邮箱是否已注册
@@ -131,7 +131,7 @@ public class ShiroService {
 
         if(user != null){
             // 邮箱已注册
-            return new Response(ReturnCode.DATA_EXIST, "email has register");
+            return new Response(ReturnCode.EMAIL_REGISTER, "email has register");
         }
 
         // 用户注册

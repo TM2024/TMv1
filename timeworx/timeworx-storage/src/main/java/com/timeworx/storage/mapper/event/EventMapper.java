@@ -1,9 +1,11 @@
 package com.timeworx.storage.mapper.event;
 
 import com.timeworx.common.entity.event.Event;
+import com.timeworx.common.entity.event.EventOrder;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -38,4 +40,13 @@ public interface EventMapper {
 
     @Select("select count(1) from Event where CreatorId = #{userId} and EventStatus = #{status} ")
     Long qryEventListCount(@Param("userId") Long userId, @Param("status") Integer status);
+
+    @Insert("insert into EventOrder (`Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime`) values (#{order.id}, #{order.eventId}, #{order.purchaserId}, #{order.purchaserName}, #{order.orderStatus}, #{order.createTime})")
+    Integer insertEventOrder(@Param("order") EventOrder eventOrder);
+
+    @Select("select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in (0 , 1) limit 1")
+    EventOrder qryUserEventOrder(@Param("eventId") Long eventId,@Param("userId") Long userId);
+
+    @Update("update EventOrder set OrderStatus = #{status} where Id = #{id}")
+    Integer updateEventOrderStatus(@Param("id") Long id,@Param("status") Integer status);
 }

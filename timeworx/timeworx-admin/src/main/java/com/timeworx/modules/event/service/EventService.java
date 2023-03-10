@@ -4,11 +4,14 @@ import com.timeworx.common.constant.ReturnCode;
 import com.timeworx.common.entity.base.DataListResponse;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.event.Event;
+import com.timeworx.common.entity.event.EventOrder;
 import com.timeworx.common.entity.user.User;
 import com.timeworx.common.utils.UniqueIDUtil;
 import com.timeworx.modules.event.dto.EventAddOrUpdateDto;
 import com.timeworx.modules.event.dto.EventQryListDto;
 import com.timeworx.storage.mapper.event.EventMapper;
+import com.timeworx.storage.redis.RedisKeys;
+import com.timeworx.storage.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description
@@ -44,24 +48,24 @@ public class EventService {
 
             // 订单状态不是未开始 无法修改
             if(event.getEventStatus() != Event.EventStatus.WAITING){
-                return new Response(ReturnCode.DATA_ERROR, "event can not modify");
+                return new Response(ReturnCode.EVENT_MODIFY_DENIED, "event can not modify");
             }
 
             // 价格无法修改
             if(eventAddOrUpdateDto.getPrice().doubleValue() != event.getPrice().doubleValue()){
-                return new Response(ReturnCode.DATA_ERROR, "price can not modify");
+                return new Response(ReturnCode.EVENT_PRICE_MODIFY_DENIED, "price can not modify");
             }
 
             // 人数限制不得低于已购人数 包含未付款和已付款
             Integer count = eventMapper.qryOrderCountByEventId(eventAddOrUpdateDto.getEventId());
             if(count > eventAddOrUpdateDto.getLimit()){
-                return new Response(ReturnCode.DATA_ERROR, "The number of subscribers exceeds the limit");
+                return new Response(ReturnCode.EVENT_NUMBER_MODIFY_DENIED, "The number of subscribers exceeds the limit");
             }
 
             // 活动日期不可修改
             if(eventAddOrUpdateDto.getStartTime().getTime() != event.getStartTime().getTime()
                     || eventAddOrUpdateDto.getEndTime().getTime() != event.getEndTime().getTime()){
-                return new Response(ReturnCode.DATA_ERROR, "event time can not modify");
+                return new Response(ReturnCode.EVENT_TIME_MODIFY_DENIED, "event time can not modify");
             }
 
             // 活动更新
@@ -111,5 +115,70 @@ public class EventService {
         Long count = eventMapper.qryEventListCount(qryListDto.getUserId(), qryListDto.getStatus());
 
         return new DataListResponse<>(ReturnCode.SUCCESS, "success", list, count);
+    }
+
+    /**
+     * 用户参加活动
+     * @param eventId
+     * @param user
+     * @return
+     */
+    public Response join(Long eventId, User user) {
+        // 查询用户是否已经下单 0-未付款 1-已付款
+        EventOrder order = eventMapper.qryUserEventOrder(eventId, user.getId());
+        if(order != null){
+            // 用户已下单
+            return new Response(ReturnCode.EVENT_HAS_JOIN, "event has join");
+        }
+
+        // 锁定活动 当前仅允许一个用户参加
+        boolean result = RedisUtil.StringOps.setIfAbsent(String.format(RedisKeys.KEY_TIMEWORX_EVENT_LIMIT, eventId), "1", 60, TimeUnit.SECONDS);
+        if(!result){
+            // 活动锁定失败
+            return new Response(ReturnCode.EVENT_JOIN_FAILED, "join event failed");
+        }
+        // 获取用户活动信息
+        Event event = eventMapper.qryEventById(eventId);
+
+        // 人数限制不得低于已购人数 包含未付款和已付款
+        Integer count = eventMapper.qryOrderCountByEventId(eventId);
+
+        if(event.getLimit() <= count){
+            // 参加活动人数已满 解锁
+            RedisUtil.KeyOps.delete(String.format(RedisKeys.KEY_TIMEWORX_EVENT_LIMIT, eventId));
+            return new Response(ReturnCode.EVENT_JOIN_LIMIT, "the number of event has reached the maximum limit");
+        }
+
+        // 新增订单信息
+        EventOrder eventOrder = new EventOrder();
+        eventOrder.setId(UniqueIDUtil.generateId());
+        eventOrder.setEventId(eventId);
+        eventOrder.setPurchaserId(user.getId());
+        eventOrder.setPurchaserName(user.getName());
+        eventOrder.setOrderStatus(EventOrder.EventOrderStatus.UNPAID);
+        eventOrder.setCreateTime(new Date());
+        eventMapper.insertEventOrder(eventOrder);
+
+        // 解锁
+        RedisUtil.KeyOps.delete(String.format(RedisKeys.KEY_TIMEWORX_EVENT_LIMIT, eventId));
+        return new Response(ReturnCode.SUCCESS, "success");
+    }
+
+    public Response exit(Long eventId, User user) {
+        // 查询订单详情 0-未付款 1-已付款
+        EventOrder eventOrder = eventMapper.qryUserEventOrder(eventId, user.getId());
+        if(eventOrder == null){
+            // 用户当前未参加活动
+            return new Response(ReturnCode.EVENT_EXIT_FAILED, "user has no event order");
+        }
+
+        if(EventOrder.EventOrderStatus.UNPAID == eventOrder.getOrderStatus()){
+            // 用户未付款 改为 已取消
+            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrder.EventOrderStatus.CANCELED);
+        }else {
+            // 用户已付款 改为 退款中
+            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrder.EventOrderStatus.REFUNDING);
+        }
+        return new Response(ReturnCode.SUCCESS, "success");
     }
 }

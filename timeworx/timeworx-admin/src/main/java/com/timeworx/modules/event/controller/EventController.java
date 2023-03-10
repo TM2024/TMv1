@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * @Description
@@ -66,6 +67,40 @@ public class EventController {
         }
         // 查询用户活动列表
         DataListResponse<Event> response = eventService.qryList(qryListDto);
+        return response;
+    }
+
+    /**
+     * 用户参加活动
+     * @param eventId
+     * @return
+     */
+    @GetMapping("/join")
+    @ResponseBody
+    @LogRecordAnnotation
+    public Response join(@NotNull(message = "eventId empty") Long eventId){
+        // 获取用户登陆信息
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        // 参加活动
+        Response response = eventService.join(eventId, user);
+
+        return response;
+    }
+
+    /**
+     * 用户退出活动
+     * @param eventId
+     * @return
+     */
+    @GetMapping("/exit")
+    @ResponseBody
+    @LogRecordAnnotation
+    public Response exit(@NotNull(message = "eventId empty") Long eventId){
+        // 获取用户登陆信息
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        // 参加活动
+        Response response = eventService.exit(eventId, user);
+
         return response;
     }
 }

@@ -67,7 +67,7 @@ public class MvcMethodLogAdvice {
         String ip = request.getRemoteAddr();
 
         // 限流
-        String key = String.format(RedisKeys.KEY_IP_METHOD, ip, method.getName());
+        String key = String.format(RedisKeys.KEY_TIMEWORX_IP_METHOD, ip, method.getName());
         Long count = RedisUtil.StringOps.incrBy(key, 1);
         if (count == 1) {
             // 设置过期时间

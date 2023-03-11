@@ -1,4 +1,4 @@
-package com.timeworx.modules.event.dto;
+package com.timeworx.modules.event.model.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.util.Date;
  * @Date 2023/3/8 8:17 PM
  */
 @Data
-public class EventAddOrUpdateDto {
+public class EventAddOrUpdateReq {
 
     private Long eventId;
 

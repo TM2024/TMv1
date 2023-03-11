@@ -47,6 +47,12 @@ public interface EventMapper {
     @Select("select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in (0 , 1) limit 1")
     EventOrder qryUserEventOrder(@Param("eventId") Long eventId,@Param("userId") Long userId);
 
-    @Update("update EventOrder set OrderStatus = #{status} where Id = #{id}")
-    Integer updateEventOrderStatus(@Param("id") Long id,@Param("status") Integer status);
+    @Update("update EventOrder set OrderStatus = #{status} where Id = #{orderId}")
+    Integer updateEventOrderStatus(@Param("orderId") Long orderId,@Param("status") Integer status);
+
+    @Update("update Event set EventStatus = #{status} where Id = #{eventId}")
+    Integer updateEventStatus(@Param("eventId") Long eventId,@Param("status") Integer status);
+
+    @Select("select count(1) from EventOrder where EventId = #{eventId} and OrderStatus in (0, 1)")
+    Integer qryEventParticipatedNum(Long eventId);
 }

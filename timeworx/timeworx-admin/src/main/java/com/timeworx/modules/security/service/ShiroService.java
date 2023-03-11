@@ -5,7 +5,7 @@ import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
 import com.timeworx.common.utils.UniqueIDUtil;
 import com.timeworx.modules.security.contoller.LoginController;
-import com.timeworx.modules.security.dto.RegisterDto;
+import com.timeworx.modules.security.model.req.RegisterReq;
 import com.timeworx.modules.security.oauth2.TokenGenerator;
 import com.timeworx.modules.security.proxy.EmailProxy;
 import com.timeworx.storage.mapper.user.UserMapper;
@@ -109,25 +109,25 @@ public class ShiroService {
 
     /**
      * user register
-     * @param registerDto
+     * @param registerReq
      * @return
      */
-    public Response register(RegisterDto registerDto) {
+    public Response register(RegisterReq registerReq) {
         // 获取验证码
-        String verifyCode = RedisUtil.StringOps.get(String.format(RedisKeys.KEY_TIMEWORX_LOGIN_PIN, registerDto.getEmail()));
+        String verifyCode = RedisUtil.StringOps.get(String.format(RedisKeys.KEY_TIMEWORX_LOGIN_PIN, registerReq.getEmail()));
 
         if(StringUtils.isBlank(verifyCode)){
             // 验证码已过期
             return new Response(ReturnCode.CODE_EXPIRE, "code has expire");
 
-        }else if(!verifyCode.equals(registerDto.getPin())){
+        }else if(!verifyCode.equals(registerReq.getPin())){
             // 验证码不正确
             return new Response(ReturnCode.CODE_ERROR, "pin incorrect");
         }
 
         // 验证邮箱是否已注册
         // 验证邮箱是否注册
-        User user = userMapper.findUserByEmail(registerDto.getEmail());
+        User user = userMapper.findUserByEmail(registerReq.getEmail());
 
         if(user != null){
             // 邮箱已注册
@@ -140,9 +140,9 @@ public class ShiroService {
         register.setId(id);
         // 随机生成用户名
         register.setName("user" + id );
-        register.setEmail(registerDto.getEmail());
+        register.setEmail(registerReq.getEmail());
         // TODO 用户密码需要加密
-        register.setPassword(registerDto.getPassword());
+        register.setPassword(registerReq.getPassword());
 
         userMapper.insertUser(register);
         return new Response(ReturnCode.SUCCESS, "success");

@@ -59,9 +59,11 @@ public class ReturnCode implements Serializable {
      * 4002: 活动人数无法修改
      * 4003: 活动时间无法修改
      * 4004: 活动参加限制
-     * 4005：活动参加失败
+     * 4005: 活动参加失败
      * 4006: 活动已参加
      * 4007: 活动退出失败
+     * 4008: 活动不存在
+     * 4009: 活动操作失败
      */
     public static final String EVENT_MODIFY_DENIED = "4000";
     public static final String EVENT_PRICE_MODIFY_DENIED  = "4001";
@@ -70,7 +72,9 @@ public class ReturnCode implements Serializable {
     public static final String EVENT_JOIN_LIMIT = "4004";
     public static final String EVENT_JOIN_FAILED = "4005";
     public static final String EVENT_HAS_JOIN = "4006";
-    public static final String EVENT_EXIT_FAILED= "4007";
+    public static final String EVENT_EXIT_FAILED = "4007";
+    public static final String EVENT_NOT_EXIST = "4008";
+    public static final String EVENT_OPERATE_FAILED = "4009";
 
 
     /**

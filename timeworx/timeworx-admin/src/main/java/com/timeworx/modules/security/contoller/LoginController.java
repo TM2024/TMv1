@@ -5,8 +5,8 @@ import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.user.User;
 import com.timeworx.modules.common.aspect.IpRateLimitAnnotation;
 import com.timeworx.modules.common.aspect.LogRecordAnnotation;
-import com.timeworx.modules.security.dto.LoginDto;
-import com.timeworx.modules.security.dto.RegisterDto;
+import com.timeworx.modules.security.model.req.LoginReq;
+import com.timeworx.modules.security.model.req.RegisterReq;
 import com.timeworx.modules.security.service.ShiroService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class LoginController {
 
     /**
      * 用户登陆
-     * @param loginDto
+     * @param loginReq
      * @return
      */
     @PostMapping("/login")
@@ -42,12 +42,12 @@ public class LoginController {
     @LogRecordAnnotation
     // ip地址限流
     @IpRateLimitAnnotation
-    public Response<String> login(@Valid @RequestBody LoginDto loginDto) {
+    public Response<String> login(@Valid @RequestBody LoginReq loginReq) {
         // 查询用户信息
-        User user = shiroService.findUserByEmail(loginDto.getEmail());
+        User user = shiroService.findUserByEmail(loginReq.getEmail());
 
         // 比较密码
-        if(user == null || !user.getPassword().equals(loginDto.getPassword())){
+        if(user == null || !user.getPassword().equals(loginReq.getPassword())){
             return new Response<>(ReturnCode.PARAM_ERROR,"username or password incorrect!");
         }
 
@@ -73,15 +73,15 @@ public class LoginController {
 
     /**
      * 用户注册
-     * @param registerDto
+     * @param registerReq
      * @return
      */
     @PostMapping("/login/register")
     @ResponseBody
     @LogRecordAnnotation
-    public Response register(@Valid @RequestBody RegisterDto registerDto){
+    public Response register(@Valid @RequestBody RegisterReq registerReq){
         // register
-        Response response = shiroService.register(registerDto);
+        Response response = shiroService.register(registerReq);
         return response;
     }
 }

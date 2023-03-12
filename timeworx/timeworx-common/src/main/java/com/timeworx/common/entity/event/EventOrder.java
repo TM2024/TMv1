@@ -28,6 +28,10 @@ public class EventOrder implements Serializable {
         /**
          * 订单未付款
          */
+        public static final int UNCOMMITTED = -1;
+        /**
+         * 订单未付款
+         */
         public static final int UNPAID = 0;
         /**
          * 订单已付款

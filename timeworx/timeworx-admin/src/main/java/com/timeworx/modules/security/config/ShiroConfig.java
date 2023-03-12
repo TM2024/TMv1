@@ -68,8 +68,6 @@ public class ShiroConfig {
         // 权限相关页面
         filterChainDefinitionMap.put("/login", "anon");
         filterChainDefinitionMap.put("/login/*", "anon");
-        // 用户活动页面
-        filterChainDefinitionMap.put("/event/qryList", "anon");
         // 除上以外所有url都必须认证通过才可以访问，未通过认证自动访问LoginUrl
         filterChainDefinitionMap.put("/**", "oauth2");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

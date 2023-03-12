@@ -44,7 +44,7 @@ public interface EventMapper {
     @Insert("insert into EventOrder (`Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime`) values (#{order.id}, #{order.eventId}, #{order.purchaserId}, #{order.purchaserName}, #{order.orderStatus}, #{order.createTime})")
     Integer insertEventOrder(@Param("order") EventOrder eventOrder);
 
-    @Select("select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in (0 , 1) limit 1")
+    @Select("select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in (0 , 1, 4) order by CreateTime desc limit 1")
     EventOrder qryUserEventOrder(@Param("eventId") Long eventId,@Param("userId") Long userId);
 
     @Update("update EventOrder set OrderStatus = #{status} where Id = #{orderId}")

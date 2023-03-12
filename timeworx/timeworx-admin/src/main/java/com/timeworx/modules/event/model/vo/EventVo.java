@@ -14,6 +14,9 @@ import java.util.Date;
 public class EventVo implements Serializable {
 
     private Long id;
+
+    private String creatorName;
+
     private String theme;
 
     private String desc;
@@ -22,13 +25,15 @@ public class EventVo implements Serializable {
 
     private Date endTime;
 
-    private Integer limit;
-
     private Integer duration;
 
     private Integer eventType;
 
     private Double price;
+
+    private Integer eventStatus;
+
+    private Integer limit;
 
     /**
      * 已参与人数 未付款 + 已付款

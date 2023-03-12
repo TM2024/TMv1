@@ -9,6 +9,7 @@ import com.timeworx.common.entity.user.User;
 import com.timeworx.common.utils.UniqueIDUtil;
 import com.timeworx.modules.event.model.req.EventAddOrUpdateReq;
 import com.timeworx.modules.event.model.req.EventQryListReq;
+import com.timeworx.modules.event.model.vo.EventDetailVo;
 import com.timeworx.modules.event.model.vo.EventVo;
 import com.timeworx.storage.mapper.event.EventMapper;
 import com.timeworx.storage.redis.RedisKeys;
@@ -137,12 +138,6 @@ public class EventService {
         if(event.getCreatorId().longValue() != user.getId().longValue()){
             return new Response(ReturnCode.PERMISSION_DENIED, "user permission denied");
         }
-        // 锁定活动
-        boolean result = RedisUtil.StringOps.setIfAbsent(String.format(RedisKeys.KEY_TIMEWORX_EVENT_LIMIT, eventId), "1", 60, TimeUnit.SECONDS);
-        if(!result){
-            // 活动锁定失败
-            return new Response(ReturnCode.EVENT_OPERATE_FAILED, "event operate failed");
-        }
         // 查询用户下单人数
         Integer count = eventMapper.qryOrderCountByEventId(eventId);
         if(count > 0){
@@ -155,6 +150,11 @@ public class EventService {
         return new Response(ReturnCode.SUCCESS, "success");
     }
 
+    /**
+     * 查询用户活动列表
+     * @param qryListDto
+     * @return
+     */
     public DataListResponse<EventVo> qryList(EventQryListReq qryListDto) {
 
         List<EventVo> list = new ArrayList<>();
@@ -179,13 +179,45 @@ public class EventService {
     }
 
     /**
+     * 查询用户活动
+     * @param eventId
+     * @param user
+     * @return
+     */
+    public Response<EventDetailVo> qryDetail(Long eventId, User user) {
+        // 查看活动详情
+        Event event = eventMapper.qryEventById(eventId);
+        if(event == null){
+            // 活动信息不存在
+            return new Response(ReturnCode.EVENT_NOT_EXIST, "event not exist");
+        }
+
+        // 查询活动已参加人数
+        Integer count = eventMapper.qryEventParticipatedNum(event.getId());
+
+        EventDetailVo eventDetailVo = new EventDetailVo();
+        BeanUtils.copyProperties(event, eventDetailVo);
+        eventDetailVo.setParticipatedNum(count);
+        // 默认未参加状态
+        eventDetailVo.setLastOrderStatus(EventOrder.EventOrderStatus.UNCOMMITTED);
+        // 查询当前用户最近的订单状态
+        if(user != null){
+            EventOrder eventOrder = eventMapper.qryUserEventOrder(eventId, user.getId());
+            if(eventOrder != null){
+                eventDetailVo.setLastOrderStatus(eventOrder.getOrderStatus());
+            }
+        }
+        return new Response<>(ReturnCode.SUCCESS, "success", eventDetailVo);
+    }
+
+    /**
      * 用户参加活动
      * @param eventId
      * @param user
      * @return
      */
     public Response join(Long eventId, User user) {
-        // 查询用户是否已经下单 0-未付款 1-已付款
+        // 查询用户是否已经下单 0-未付款 1-已付款 4-退款中
         EventOrder order = eventMapper.qryUserEventOrder(eventId, user.getId());
         if(order != null){
             // 用户已下单
@@ -225,8 +257,14 @@ public class EventService {
         return new Response(ReturnCode.SUCCESS, "success");
     }
 
+    /**
+     * 用户退出活动
+     * @param eventId
+     * @param user
+     * @return
+     */
     public Response exit(Long eventId, User user) {
-        // 查询订单详情 0-未付款 1-已付款
+        // 查询订单详情 0-未付款 1-已付款 4-退款中
         EventOrder eventOrder = eventMapper.qryUserEventOrder(eventId, user.getId());
         if(eventOrder == null){
             // 用户当前未参加活动

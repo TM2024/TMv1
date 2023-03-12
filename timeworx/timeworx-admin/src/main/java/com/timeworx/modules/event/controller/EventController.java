@@ -7,6 +7,7 @@ import com.timeworx.common.entity.user.User;
 import com.timeworx.modules.common.aspect.LogRecordAnnotation;
 import com.timeworx.modules.event.model.req.EventAddOrUpdateReq;
 import com.timeworx.modules.event.model.req.EventQryListReq;
+import com.timeworx.modules.event.model.vo.EventDetailVo;
 import com.timeworx.modules.event.model.vo.EventVo;
 import com.timeworx.modules.event.service.EventService;
 import org.apache.shiro.SecurityUtils;
@@ -84,6 +85,20 @@ public class EventController {
         }
         // 查询用户活动列表
         DataListResponse<EventVo> response = eventService.qryList(qryListDto);
+        return response;
+    }
+
+    /**
+     * 查询用户活动详情
+     * @param eventId
+     * @return
+     */
+    @GetMapping("/qryDetail")
+    @ResponseBody
+    @LogRecordAnnotation
+    public Response<EventDetailVo> qryDetail(@NotNull(message = "eventId empty") Long eventId){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        Response<EventDetailVo> response = eventService.qryDetail(eventId, user);
         return response;
     }
 

@@ -44,27 +44,4 @@ public class Event implements Serializable {
     private Integer eventStatus;
 
     private Date createTime;
-
-    public class EventStatus{
-        /**
-         * 活动未开始
-         */
-        public static final int WAITING = 0;
-        /**
-         * 活动进行中
-         */
-        public static final int ONGOING = 1;
-        /**
-         * 活动已完成
-         */
-        public static final int FINISH = 2;
-        /**
-         * 活动取消中
-         */
-        public static final int CANCELING = 3;
-        /**
-         * 活动已取消
-         */
-        public static final int DELETED = 4;
-    }
 }

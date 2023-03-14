@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * @Author: ryzhang
  * @Date 2023/3/8 16:50 PM
  */
-@Retention(RetentionPolicy.RUNTIME)//运行时有效
-@Target(ElementType.METHOD)//作用于方法
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
 public @interface IpRateLimitAnnotation {
 
     /**

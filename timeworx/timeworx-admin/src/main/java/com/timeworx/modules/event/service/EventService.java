@@ -1,6 +1,9 @@
 package com.timeworx.modules.event.service;
 
 import com.timeworx.common.constant.ReturnCode;
+import com.timeworx.common.constant.event.EventOrderScene;
+import com.timeworx.common.constant.event.EventOrderStatus;
+import com.timeworx.common.constant.event.EventStatus;
 import com.timeworx.common.entity.base.DataListResponse;
 import com.timeworx.common.entity.base.Response;
 import com.timeworx.common.entity.event.Event;
@@ -61,7 +64,7 @@ public class EventService {
             }
 
             // 订单状态不是未开始 无法修改
-            if(event.getEventStatus() != Event.EventStatus.WAITING){
+            if(event.getEventStatus() != EventStatus.WAITING){
                 return new Response(ReturnCode.EVENT_MODIFY_DENIED, "event can not modify");
             }
 
@@ -71,7 +74,7 @@ public class EventService {
             }
 
             // 人数限制不得低于已购人数 包含未付款和已付款
-            Integer count = eventMapper.qryOrderCountByEventId(eventAddOrUpdateReq.getEventId());
+            Integer count = eventMapper.qryEventParticipatedNum(eventAddOrUpdateReq.getEventId(), EventOrderScene.PARTICIPATED_STATUS);
             if(count > eventAddOrUpdateReq.getLimit()){
                 return new Response(ReturnCode.EVENT_NUMBER_MODIFY_DENIED, "The number of subscribers exceeds the limit");
             }
@@ -100,8 +103,8 @@ public class EventService {
             // 开始时间大于结束时间
             return new Response(ReturnCode.PARAM_ERROR, "startTime is later then endTime");
         }
-        // 转换成小时
-        Integer duration = (int) diff / 3600000;
+        // 转换成分钟
+        Integer duration = (int) diff / 60000;
 
         // 用户购买
         Event event = new Event();
@@ -113,7 +116,7 @@ public class EventService {
         // 时长
         event.setDuration(duration);
         // 活动状态
-        event.setEventStatus(Event.EventStatus.WAITING);
+        event.setEventStatus(EventStatus.WAITING);
         // 创建时间
         event.setCreateTime(new Date());
         // 活动写入
@@ -139,13 +142,13 @@ public class EventService {
             return new Response(ReturnCode.PERMISSION_DENIED, "user permission denied");
         }
         // 查询用户下单人数
-        Integer count = eventMapper.qryOrderCountByEventId(eventId);
+        Integer count = eventMapper.qryEventParticipatedNum(eventId, EventOrderScene.PARTICIPATED_STATUS);
         if(count > 0){
             // 有参加用户 更新成取消中
-            eventMapper.updateEventStatus(eventId, Event.EventStatus.CANCELING);
+            eventMapper.updateEventStatus(eventId, EventStatus.CANCELING);
         }else {
             // 无参加用户 更新成已取消
-            eventMapper.updateEventStatus(eventId, Event.EventStatus.DELETED);
+            eventMapper.updateEventStatus(eventId, EventStatus.DELETED);
         }
         return new Response(ReturnCode.SUCCESS, "success");
     }
@@ -167,7 +170,7 @@ public class EventService {
             EventVo eventVo = new EventVo();
             BeanUtils.copyProperties(event, eventVo);
             // 查询活动已订购人数
-            Integer count = eventMapper.qryEventParticipatedNum(event.getId());
+            Integer count = eventMapper.qryEventParticipatedNum(event.getId(), EventOrderScene.PARTICIPATED_STATUS);
             eventVo.setParticipatedNum(count);
             list.add(eventVo);
         });
@@ -193,16 +196,16 @@ public class EventService {
         }
 
         // 查询活动已参加人数
-        Integer count = eventMapper.qryEventParticipatedNum(event.getId());
+        Integer count = eventMapper.qryEventParticipatedNum(event.getId(), EventOrderScene.PARTICIPATED_STATUS);
 
         EventDetailVo eventDetailVo = new EventDetailVo();
         BeanUtils.copyProperties(event, eventDetailVo);
         eventDetailVo.setParticipatedNum(count);
         // 默认未参加状态
-        eventDetailVo.setLastOrderStatus(EventOrder.EventOrderStatus.UNCOMMITTED);
-        // 查询当前用户最近的订单状态
+        eventDetailVo.setLastOrderStatus(EventOrderStatus.UNCOMMITTED);
+        // 查询当前用户最近未结束的订单状态
         if(user != null){
-            EventOrder eventOrder = eventMapper.qryUserEventOrder(eventId, user.getId());
+            EventOrder eventOrder = eventMapper.qryUserLastUncloseEventOrder(eventId, user.getId(), EventOrderScene.UNCLOSED_STATUS);
             if(eventOrder != null){
                 eventDetailVo.setLastOrderStatus(eventOrder.getOrderStatus());
             }
@@ -217,8 +220,8 @@ public class EventService {
      * @return
      */
     public Response join(Long eventId, User user) {
-        // 查询用户是否已经下单 0-未付款 1-已付款 4-退款中
-        EventOrder order = eventMapper.qryUserEventOrder(eventId, user.getId());
+        // 查询用户最新未结束订单 0-未付款 1-已付款 4-退款中
+        EventOrder order = eventMapper.qryUserLastUncloseEventOrder(eventId, user.getId(), EventOrderScene.UNCLOSED_STATUS);
         if(order != null){
             // 用户已下单
             return new Response(ReturnCode.EVENT_HAS_JOIN, "event has join");
@@ -234,7 +237,7 @@ public class EventService {
         Event event = eventMapper.qryEventById(eventId);
 
         // 人数限制不得低于已购人数 包含未付款和已付款
-        Integer count = eventMapper.qryOrderCountByEventId(eventId);
+        Integer count = eventMapper.qryEventParticipatedNum(eventId, EventOrderScene.PARTICIPATED_STATUS);
 
         if(event.getLimit() <= count){
             // 参加活动人数已满 解锁
@@ -248,7 +251,7 @@ public class EventService {
         eventOrder.setEventId(eventId);
         eventOrder.setPurchaserId(user.getId());
         eventOrder.setPurchaserName(user.getName());
-        eventOrder.setOrderStatus(EventOrder.EventOrderStatus.UNPAID);
+        eventOrder.setOrderStatus(EventOrderStatus.UNPAID);
         eventOrder.setCreateTime(new Date());
         eventMapper.insertEventOrder(eventOrder);
 
@@ -264,19 +267,19 @@ public class EventService {
      * @return
      */
     public Response exit(Long eventId, User user) {
-        // 查询订单详情 0-未付款 1-已付款 4-退款中
-        EventOrder eventOrder = eventMapper.qryUserEventOrder(eventId, user.getId());
+        // 查询用户最新未结束订单详情 0-未付款 1-已付款 4-退款中
+        EventOrder eventOrder = eventMapper.qryUserLastUncloseEventOrder(eventId, user.getId(), EventOrderScene.UNCLOSED_STATUS);
         if(eventOrder == null){
             // 用户当前未参加活动
             return new Response(ReturnCode.EVENT_EXIT_FAILED, "user has no event order");
         }
 
-        if(EventOrder.EventOrderStatus.UNPAID == eventOrder.getOrderStatus()){
+        if(EventOrderStatus.UNPAID == eventOrder.getOrderStatus()){
             // 用户未付款 改为 已取消
-            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrder.EventOrderStatus.CANCELED);
+            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrderStatus.CANCELED);
         }else {
             // 用户已付款 改为 退款中
-            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrder.EventOrderStatus.REFUNDING);
+            eventMapper.updateEventOrderStatus(eventOrder.getId(), EventOrderStatus.REFUNDING);
         }
         return new Response(ReturnCode.SUCCESS, "success");
     }

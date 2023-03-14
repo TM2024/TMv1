@@ -53,7 +53,7 @@
     <!-- 屏蔽日志打印信息 -->
 <!--    <logger name="com.alibaba.nacos" level="OFF" addtivity="false"> </logger>-->
 
-    <root level="INFO">
+    <root level="info">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>

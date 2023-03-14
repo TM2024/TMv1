@@ -21,9 +21,6 @@ public interface EventMapper {
             " `EventStatus`, `CreateTime` from Event where Id = #{eventId}")
     Event qryEventById(@Param("eventId") Long eventId);
 
-    @Select("select count(1) from EventOrder where EventId = #{eventId} and OrderStatus in (0 , 1)")
-    Integer qryOrderCountByEventId(@Param("eventId") Long eventId);
-
     @Insert("replace into `Event` (`Id`, `CreatorId`, `CreatorName`, `Theme`, `Desc`, `PhotoUrl`, `StartTime`, `EndTime`, `Duration`, `EventType`, `EventLink`, `Price`, `Limit`, `ShareLink`, `EventStatus`, `CreateTime` ) " +
             "VALUES (#{event.id}, #{event.creatorId}, #{event.creatorName}, #{event.theme}, #{event.desc}, #{event.photoUrl}, #{event.startTime}, #{event.endTime}, #{event.duration}, #{event.eventType}, #{event.eventLink}, #{event.price}, #{event.limit}, #{event.shareLink},  #{event.eventStatus}, #{event.createTime});")
     Integer replaceEvent(@Param("event") Event event);
@@ -44,8 +41,20 @@ public interface EventMapper {
     @Insert("insert into EventOrder (`Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime`) values (#{order.id}, #{order.eventId}, #{order.purchaserId}, #{order.purchaserName}, #{order.orderStatus}, #{order.createTime})")
     Integer insertEventOrder(@Param("order") EventOrder eventOrder);
 
-    @Select("select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in (0 , 1, 4) order by CreateTime desc limit 1")
-    EventOrder qryUserEventOrder(@Param("eventId") Long eventId,@Param("userId") Long userId);
+    /**
+     * 查询用户最新未结束订单状态
+     * @param eventId
+     * @param userId
+     * @return
+     */
+    @Select("<script>" +
+            "select `Id`, `EventId`, `PurchaserId`, `PurchaserName`, `OrderStatus`, `CreateTime` from EventOrder where EventId = #{eventId} and purchaserId = #{userId} and OrderStatus in " +
+            "<foreach collection='statusList' item='item' index='index' open='(' close=')' separator=','>" +
+            " #{item} " +
+            "</foreach>" +
+            " order by CreateTime desc limit 1" +
+            "</script>")
+    EventOrder qryUserLastUncloseEventOrder(@Param("eventId") Long eventId,@Param("userId") Long userId, @Param("statusList") List<Integer> statusList);
 
     @Update("update EventOrder set OrderStatus = #{status} where Id = #{orderId}")
     Integer updateEventOrderStatus(@Param("orderId") Long orderId,@Param("status") Integer status);
@@ -53,6 +62,16 @@ public interface EventMapper {
     @Update("update Event set EventStatus = #{status} where Id = #{eventId}")
     Integer updateEventStatus(@Param("eventId") Long eventId,@Param("status") Integer status);
 
-    @Select("select count(1) from EventOrder where EventId = #{eventId} and OrderStatus in (0, 1)")
-    Integer qryEventParticipatedNum(Long eventId);
+    /**
+     * 查询已参加活动的用户人数
+     * @param eventId
+     * @return
+     */
+    @Select("<script>" +
+            "select count(1) from EventOrder where EventId = #{eventId} and OrderStatus in" +
+            "<foreach collection='statusList' item='item' index='index' open='(' close=')' separator=','>" +
+            " #{item} " +
+            "</foreach>" +
+            "</script>")
+    Integer qryEventParticipatedNum(@Param("eventId") Long eventId, @Param("statusList") List<Integer> statusList);
 }
